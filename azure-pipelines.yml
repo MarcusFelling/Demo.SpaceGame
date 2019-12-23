@@ -1,5 +1,6 @@
 variables:
   buildConfiguration: 'Release'
+  dotnetSdkVersion: '2.1.505'
 
 stages:
 - stage: 'Build'
