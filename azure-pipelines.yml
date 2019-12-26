@@ -282,6 +282,14 @@ stages:
               azureSubscription: '$(serviceConnection)'
               appName: '$(appName)-$(System.StageName)-$(appID)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+          - task: AzureCLI@2
+            displayName: 'Set connection string'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az webapp config connection-string set --name $(appName)-$(System.StageName)-$(appID) --resource-group $(serviceConnection) --connection-string-type SQLAzure --settings "DefaultConnection=Server=tcp:$(servername).database.windows.net,1433;Initial Catalog=$(databasename);Persist Security Info=False;User ID=$(adminlogin);Password=$(adminPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"              
   - job: RunUITests
     dependsOn: Deploy
     displayName: 'Run UI tests'
@@ -331,6 +339,14 @@ stages:
               azureSubscription: '$(serviceConnection)'
               appName: '$(appName)-$(System.StageName)-$(appID)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+          - task: AzureCLI@2
+            displayName: 'Set connection string'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az webapp config connection-string set --name $(appName)-$(System.StageName)-$(appID) --resource-group $(serviceConnection) --connection-string-type SQLAzure --settings "DefaultConnection=Server=tcp:$(servername).database.windows.net,1433;Initial Catalog=$(databasename);Persist Security Info=False;User ID=$(adminlogin);Password=$(adminPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"              
   - job: RunLoadTests
     dependsOn: Deploy
     displayName: 'Run load tests'
@@ -380,6 +396,14 @@ stages:
               azureSubscription: '$(serviceConnection)'
               appName: '$(appName)-$(System.StageName)-$(appID)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+          - task: AzureCLI@2
+            displayName: 'Set connection string'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az webapp config connection-string set --name $(appName)-$(System.StageName)-$(appID) --resource-group $(serviceConnection) --connection-string-type SQLAzure --settings "DefaultConnection=Server=tcp:$(servername).database.windows.net,1433;Initial Catalog=$(databasename);Persist Security Info=False;User ID=$(adminlogin);Password=$(adminPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"              
   - job: RunUITests
     dependsOn: Deploy
     displayName: 'Run UI tests'
