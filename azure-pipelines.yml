@@ -1,8 +1,10 @@
 variables:
   buildConfiguration: 'Release'
   dotnetSdkVersion: '2.1.505'
-  ServiceConnection: 'tailspin-space-game-rg'
-
+  serviceConnection: 'tailspin-space-game-rg'
+  appName: 'tailspin-space-game-web'
+  appID: '26178'
+  
 stages:
 - stage: 'Build'
   displayName: 'Build the web application'
@@ -112,7 +114,7 @@ stages:
           - task: SqlAzureDacpacDeployment@1
             displayName: Generate schema change script
             inputs:
-              azureSubscription: '$(ServiceConnection)'
+              azureSubscription: '$(serviceConnection)'
               authenticationType: 'server'
               serverName: '$(servername).database.windows.net'
               databaseName: '$(databasename)'
@@ -186,7 +188,7 @@ stages:
           - task: SqlAzureDacpacDeployment@1
             displayName: 'Deploy SQL schema'
             inputs:
-              azureSubscription: '$(ServiceConnection)'
+              azureSubscription: '$(serviceConnection)'
               authenticationType: 'server'
               serverName: '$(servername).database.windows.net'
               databaseName: '$(databasename)'
@@ -246,27 +248,17 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: '$(ServiceConnection)'
-              appName: '$(WebAppNameDev)'
+              azureSubscription: '$(serviceConnection)'
+              appName: '$(appName)-$(System.StageName)-$(appID)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
           - task: AzureCLI@2
             displayName: 'Set connection string'
             inputs:
-              azureSubscription: '$(ServiceConnection)'
+              azureSubscription: '$(serviceConnection)'
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                # Get connection string for the database
-                connstring=$(az sql db show-connection-string --name $(databasename) --server $(servername).database.windows.net \
-                --client ado.net --output tsv)
-                
-                # Add credentials to connection string
-                connstring=${connstring//<username>/$(adminlogin)}
-                connstring=${connstring//<password>/$(adminPassword)}
-                
-                # Assign the connection string to an app setting in the web app
-                az webapp config connection-string set --name $(WebAppNameDev) --resource-group $(ServiceConnection) --connection-string-type SQLAzure --settings "DefaultConnection=$connstring"
-
+                az webapp config connection-string set --name $(appName)-$(System.StageName)-$(appID) --resource-group $(serviceConnection) --connection-string-type SQLAzure --settings "DefaultConnection=Server=tcp:$(servername).database.windows.net,1433;Initial Catalog=$(databasename);Persist Security Info=False;User ID=$(adminlogin);Password=$(adminPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
   dependsOn: Dev
@@ -287,8 +279,8 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: '$(ServiceConnection)'
-              appName: '$(WebAppNameTest)'
+              azureSubscription: '$(serviceConnection)'
+              appName: '$(appName)-$(System.StageName)-$(appID)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
   - job: RunUITests
     dependsOn: Deploy
@@ -336,8 +328,8 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: '$(ServiceConnection)'
-              appName: '$(WebAppNameStaging)'
+              azureSubscription: '$(serviceConnection)'
+              appName: '$(appName)-$(System.StageName)-$(appID)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
   - job: RunLoadTests
     dependsOn: Deploy
@@ -373,7 +365,7 @@ stages:
       vmImage: 'Ubuntu-16.04'
     environment: prod
     variables:
-      - name: ServiceConnection
+      - name: serviceConnection
         value: 'tailspin-space-game-prod-rg'
       - group: 'Release'
     strategy:
@@ -385,8 +377,8 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: '$(ServiceConnection)'
-              appName: '$(WebAppNameProd)'
+              azureSubscription: '$(serviceConnection)'
+              appName: '$(appName)-$(System.StageName)-$(appID)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
   - job: RunUITests
     dependsOn: Deploy
