@@ -265,7 +265,7 @@ stages:
                 connstring=${connstring//<password>/$(adminPassword)}
                 
                 # Assign the connection string to an app setting in the web app
-                az webapp config appsettings set --name $(WebAppNameDev) --resource-group $(ServiceConnection) --settings "DefaultConnection=$connstring"
+                az webapp config connection-string set --name $(WebAppNameDev) --resource-group $(ServiceConnection) --connection-string-type SQLAzure --settings "DefaultConnection=$connstring"
 
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
