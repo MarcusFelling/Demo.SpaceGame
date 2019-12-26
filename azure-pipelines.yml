@@ -249,6 +249,23 @@ stages:
               azureSubscription: '$(ServiceConnection)'
               appName: '$(WebAppNameDev)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: '$(ServiceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                # Get connection string for the database
+                connstring=$(az sql db show-connection-string --name $(databasename) --server $(servername).database.windows.net \
+                --client ado.net --output tsv)
+                
+                # Add credentials to connection string
+                connstring=${connstring//<username>/$(adminlogin)}
+                connstring=${connstring//<password>/$(adminPassword)}
+                
+                # Assign the connection string to an app setting in the web app
+                az webapp config appsettings set --name $appName --resource-group $(ServiceConnection)\
+                --settings "SQLSRV_CONNSTR=$connstring"
 
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
