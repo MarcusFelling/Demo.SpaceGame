@@ -269,8 +269,6 @@ stages:
       vmImage: 'Ubuntu-16.04'
     environment: test
     variables:
-    - name: 'SITE_URL'
-      value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
     - group: 'Release'
     strategy:
       runOnce:
@@ -298,6 +296,8 @@ stages:
     pool:
       vmImage: 'windows-2019'
     variables:
+    - name: 'SITE_URL'
+      value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'    
     - group: 'Release'
     steps: 
     - task: DotNetCoreInstaller@0
