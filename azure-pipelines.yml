@@ -1,6 +1,7 @@
 variables:
   buildConfiguration: 'Release'
   dotnetSdkVersion: '2.1.505'
+  ServiceConnection: 'tailspin-space-game-rg'
 
 stages:
 - stage: 'Build'
@@ -15,7 +16,6 @@ stages:
 
     variables:
       wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
-      dotnetSdkVersion: '2.1.505'
 
     steps:
     - task: DotNetCoreInstaller@0
@@ -112,7 +112,7 @@ stages:
           - task: SqlAzureDacpacDeployment@1
             displayName: Generate schema change script
             inputs:
-              azureSubscription: 'tailspin-space-game-rg'
+              azureSubscription: '$(ServiceConnection)'
               authenticationType: 'server'
               serverName: '$(servername).database.windows.net'
               databaseName: '$(databasename)'
@@ -186,7 +186,7 @@ stages:
           - task: SqlAzureDacpacDeployment@1
             displayName: 'Deploy SQL schema'
             inputs:
-              azureSubscription: 'tailspin-space-game-rg'
+              azureSubscription: '$(ServiceConnection)'
               authenticationType: 'server'
               serverName: '$(servername).database.windows.net'
               databaseName: '$(databasename)'
@@ -246,7 +246,7 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: 'tailspin-space-game-rg'
+              azureSubscription: '$(ServiceConnection)'
               appName: '$(WebAppNameDev)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
 
@@ -270,7 +270,7 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: 'tailspin-space-game-rg'
+              azureSubscription: '$(ServiceConnection)'
               appName: '$(WebAppNameTest)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
   - job: RunUITests
@@ -319,7 +319,7 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: 'tailspin-space-game-rg'
+              azureSubscription: '$(ServiceConnection)'
               appName: '$(WebAppNameStaging)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
   - job: RunLoadTests
@@ -356,7 +356,9 @@ stages:
       vmImage: 'Ubuntu-16.04'
     environment: prod
     variables:
-    - group: 'Release'
+      - name: ServiceConnection
+        value: 'tailspin-space-game-prod-rg'
+      - group: 'Release'
     strategy:
       runOnce:
         deploy:
@@ -366,7 +368,7 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Azure App Service Deploy: website'
             inputs:
-              azureSubscription: 'tailspin-space-game-prod-rg'
+              azureSubscription: '$(ServiceConnection)'
               appName: '$(WebAppNameProd)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
   - job: RunUITests
