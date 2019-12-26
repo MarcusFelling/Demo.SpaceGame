@@ -250,6 +250,7 @@ stages:
               appName: '$(WebAppNameDev)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
           - task: AzureCLI@2
+            displayName: 'Set connection string'
             inputs:
               azureSubscription: '$(ServiceConnection)'
               scriptType: 'bash'
@@ -264,7 +265,7 @@ stages:
                 connstring=${connstring//<password>/$(adminPassword)}
                 
                 # Assign the connection string to an app setting in the web app
-                az webapp config appsettings set --name $(WebAppNameDev) --resource-group $(ServiceConnection) --settings "SQLSRV_CONNSTR=$connstring"
+                az webapp config appsettings set --name $(WebAppNameDev) --resource-group $(ServiceConnection) --settings "DefaultConnection=$connstring"
 
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
