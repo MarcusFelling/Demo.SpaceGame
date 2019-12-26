@@ -269,6 +269,8 @@ stages:
       vmImage: 'Ubuntu-16.04'
     environment: test
     variables:
+    - name: 'SITE_URL'
+      value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
     - group: 'Release'
     strategy:
       runOnce:
@@ -383,6 +385,8 @@ stages:
     variables:
       - name: serviceConnection
         value: 'tailspin-space-game-prod-rg'
+      - name: 'SITE_URL'
+        value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'        
       - group: 'Release'
     strategy:
       runOnce:
