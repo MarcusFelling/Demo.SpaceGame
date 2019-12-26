@@ -264,8 +264,7 @@ stages:
                 connstring=${connstring//<password>/$(adminPassword)}
                 
                 # Assign the connection string to an app setting in the web app
-                az webapp config appsettings set --name $appName --resource-group $(ServiceConnection)\
-                --settings "SQLSRV_CONNSTR=$connstring"
+                az webapp config appsettings set --name $(WebAppNameDev) --resource-group $(ServiceConnection) --settings "SQLSRV_CONNSTR=$connstring"
 
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
