@@ -1,5 +1,5 @@
 variables:
-  buildConfiguration: 'Release'
+  buildConfiguration: 'LTCG-KeyVault'
   dotnetSdkVersion: '2.1.505'
   serviceConnection: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game-web'
@@ -103,7 +103,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     variables:
-    - group: 'Release'
+    - group: 'LTCG-KeyVault'
     environment: 'dbaverificationscript'
     strategy:
       runOnce:
@@ -149,7 +149,7 @@ stages:
                   Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
                   $methodParameters = @{
                     ProjectName = "$(System.TeamProject)"
-                    Name = "Release"}
+                    Name = "LTCG-KeyVault"}
                   $vg = Get-VSTeamVariableGroup @methodParameters
                   $vars = @{}
                   $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
@@ -160,7 +160,7 @@ stages:
                   $methodParameters = @{
                     id = $vg.id
                     ProjectName = "$(System.TeamProject)"
-                    Name = "Release"
+                    Name = "LTCG-KeyVault"
                     Description = ""
                     Type = "Vsts"
                     Variables = $vars}
@@ -168,7 +168,7 @@ stages:
 
 - stage: DBAVerificationApply
   variables: 
-    - group: 'Release'
+    - group: 'LTCG-KeyVault'
   displayName: 'Apply database schema changes'
   dependsOn: DBAVerificationScript
   condition: and(succeeded('DBAVerificationScript'), eq(variables['schemaChanged'], True))
@@ -177,7 +177,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     variables:
-    - group: 'Release'
+    - group: 'LTCG-KeyVault'
     environment: 'dbaverificationapply'
     strategy:
       runOnce:
@@ -208,7 +208,7 @@ stages:
                 Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
                 $methodParameters = @{
                   ProjectName = "$(System.TeamProject)"
-                  Name = "Release"}
+                  Name = "LTCG-KeyVault"}
                 $vg = Get-VSTeamVariableGroup  @methodParameters 
                 $vars = @{}
                 $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
@@ -216,7 +216,7 @@ stages:
                 $methodParameters = @{
                   id = $vg.id
                   ProjectName = "$(System.TeamProject)"
-                  Name = "Release"
+                  Name = "LTCG-KeyVault"
                   Description = ""
                   Type = "Vsts"
                   Variables = $vars}
@@ -239,7 +239,7 @@ stages:
       vmImage: 'Ubuntu-16.04'
     environment: dev
     variables:
-    - group: Release
+    - group: LTCG-KeyVault
     strategy:
       runOnce:
         deploy:
@@ -270,7 +270,7 @@ stages:
       vmImage: 'Ubuntu-16.04'
     environment: test
     variables:
-    - group: 'Release'
+    - group: 'LTCG-KeyVault'
     strategy:
       runOnce:
         deploy:
@@ -297,7 +297,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     variables:    
-    - group: 'Release'
+    - group: 'LTCG-KeyVault'
     steps: 
     - task: DotNetCoreInstaller@0
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
@@ -327,7 +327,7 @@ stages:
       vmImage: 'Ubuntu-16.04'
     environment: staging
     variables:
-    - group: 'Release'
+    - group: 'LTCG-KeyVault'
     strategy:
       runOnce:
         deploy:
@@ -387,7 +387,7 @@ stages:
         value: 'tailspin-space-game-prod-rg'
       - name: 'SITE_URL'
         value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'        
-      - group: 'Release'
+      - group: 'LTCG-KeyVault'
     strategy:
       runOnce:
         deploy:
@@ -414,7 +414,7 @@ stages:
     pool:
       vmImage: 'windows-2019'
     variables:
-    - group: 'Release'
+    - group: 'LTCG-KeyVault'
     steps: 
     - task: DotNetCoreInstaller@0
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
