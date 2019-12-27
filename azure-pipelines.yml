@@ -146,7 +146,7 @@ stages:
                 $containsWord = $file | %{$_ -match "CREATE" -or $_ -match "ALTER" -or $_ -match "DROP"}
                 if ($containsWord -contains $true) {
                   Install-Module VSTeam -Scope CurrentUser -Force
-                  Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
+                  Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
                   $methodParameters = @{
                     ProjectName = "$(System.TeamProject)"
                     Name = "Release"}
@@ -205,7 +205,7 @@ stages:
               targetType: 'inline'
               script: | 
                 Install-Module VSTeam -Scope CurrentUser -Force
-                Set-VSTeamAccount –Account $(Acct) -PersonalAccessToken $(PAT)
+                Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
                 $methodParameters = @{
                   ProjectName = "$(System.TeamProject)"
                   Name = "Release"}
