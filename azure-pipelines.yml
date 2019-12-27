@@ -355,7 +355,6 @@ stages:
       vmImage: 'Ubuntu-16.04'
     variables:
       jmeterVersion: '5.2'
-      STAGING_URL: '$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
     steps: 
     - script: |
         wget -c ftp.ps.pl/pub/apache/jmeter/binaries/apache-jmeter-$(jmeterVersion).tgz
@@ -384,9 +383,7 @@ stages:
     environment: prod
     variables:
       - name: serviceConnection
-        value: 'tailspin-space-game-prod-rg'
-      - name: 'SITE_URL'
-        value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'        
+        value: 'tailspin-space-game-prod-rg'      
       - group: 'Release'
     strategy:
       runOnce:
