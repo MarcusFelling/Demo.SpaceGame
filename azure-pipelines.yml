@@ -4,6 +4,7 @@ variables:
   serviceConnection: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game-web'
   appID: '26178'
+  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'  
   
 stages:
 - stage: 'Build'
@@ -295,9 +296,7 @@ stages:
     displayName: 'Run UI tests'
     pool:
       vmImage: 'windows-2019'
-    variables:
-    - name: 'SITE_URL'
-      value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'    
+    variables:    
     - group: 'Release'
     steps: 
     - task: DotNetCoreInstaller@0
