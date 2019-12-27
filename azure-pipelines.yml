@@ -355,6 +355,7 @@ stages:
       vmImage: 'Ubuntu-16.04'
     variables:
       jmeterVersion: '5.2'
+      STAGING_URL: '$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
     steps: 
     - script: |
         wget -c ftp.ps.pl/pub/apache/jmeter/binaries/apache-jmeter-$(jmeterVersion).tgz
