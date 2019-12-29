@@ -4,7 +4,8 @@ variables:
   serviceConnection: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game-web'
   appID: '26178'
-  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'  
+  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
+  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
   
 stages:
 - stage: 'Build'
@@ -16,10 +17,6 @@ stages:
       vmImage: 'Ubuntu-16.04'
       demands:
         - npm
-
-    variables:
-      wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
-
     steps:
     - task: DotNetCoreInstaller@0
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
