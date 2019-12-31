@@ -7,9 +7,9 @@ CREATE TABLE [dbo].[ProfileAchievements] (
 
 GO
 
-ALTER TABLE [dbo].[ProfileAchievements] WITH NOCHECK
+ALTER TABLE [dbo].[ProfileAchievements]
     ADD CONSTRAINT [FK_ProfileAchievements_Profiles] FOREIGN KEY ([profileId]) REFERENCES [dbo].[Profiles] ([id]);
 GO
-ALTER TABLE [dbo].[ProfileAchievements] WITH NOCHECK
+ALTER TABLE [dbo].[ProfileAchievements]
     ADD CONSTRAINT [FK_ProfileAchievements_Achievements] FOREIGN KEY ([achievementId]) REFERENCES [dbo].[Achievements] ([id]);
 GO
