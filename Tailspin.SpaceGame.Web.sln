@@ -1,9 +1,15 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tailspin.SpaceGame.Web", "Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj", "{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tailspin.SpaceGame.Web", "Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj", "{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tailspin.SpaceGame.Web.Tests", "Tailspin.SpaceGame.Web.Tests\Tailspin.SpaceGame.Web.Tests.csproj", "{773BA444-0D67-4F37-8762-17E108CCD5F5}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Tailspin.SpaceGame.Database", "Tailspin.SpaceGame.Database\Tailspin.SpaceGame.Database.sqlproj", "{8BAA5C4E-F217-4E45-8473-1EBAE2684BFF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tailspin.SpaceGame.Web.UITests", "Tailspin.SpaceGame.Web.UITests\Tailspin.SpaceGame.Web.UITests.csproj", "{A235976A-AA73-46F3-816D-A225E7BC73FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,21 +17,29 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{773BA444-0D67-4F37-8762-17E108CCD5F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{773BA444-0D67-4F37-8762-17E108CCD5F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{773BA444-0D67-4F37-8762-17E108CCD5F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{773BA444-0D67-4F37-8762-17E108CCD5F5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8BAA5C4E-F217-4E45-8473-1EBAE2684BFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8BAA5C4E-F217-4E45-8473-1EBAE2684BFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BAA5C4E-F217-4E45-8473-1EBAE2684BFF}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{8BAA5C4E-F217-4E45-8473-1EBAE2684BFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BAA5C4E-F217-4E45-8473-1EBAE2684BFF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8BAA5C4E-F217-4E45-8473-1EBAE2684BFF}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A235976A-AA73-46F3-816D-A225E7BC73FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A235976A-AA73-46F3-816D-A225E7BC73FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A235976A-AA73-46F3-816D-A225E7BC73FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A235976A-AA73-46F3-816D-A225E7BC73FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {7F098CB2-A2C4-4B93-9DA1-127DDFB7E1E0}
+		SolutionGuid = {CDECAE68-0820-4E4C-81C4-091BAC64F8ED}
 	EndGlobalSection
 EndGlobal
