@@ -4,11 +4,11 @@
 const gulp = require("gulp"),
       rimraf = require("rimraf"),
       concat = require("gulp-concat"),
-      cleanCSS = require("gulp-clean-css"),
+      cssmin = require("gulp-cssmin"),
       uglify = require("gulp-uglify");
 
 const paths = {
-  webroot: "./Tailspin.SpaceGame.Web/wwwroot/"
+  webroot: "./wwwroot/"
 };
 
 paths.js = paths.webroot + "js/**/*.js";
@@ -32,7 +32,7 @@ gulp.task("min:js", () => {
 gulp.task("min:css", () => {
   return gulp.src([paths.css, "!" + paths.minCss])
     .pipe(concat(paths.concatCssDest))
-    .pipe(cleanCSS())
+    .pipe(cssmin())
     .pipe(gulp.dest("."));
 });
 

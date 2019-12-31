@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <ProjectGuid>{A0C4E31E-AC75-4F39-9F59-0AA19D9B8F46}</ProjectGuid>
-    <UserSecretsId>d7faad9d-d27a-4122-89ff-b9376c13b153</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,5 +13,27 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\avatars\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="SampleData\profiles.json" />
+    <Content Remove="SampleData\scores.json" />
+    <Content Remove="SampleData\profiles.json" />
+    <Content Remove="SampleData\scores.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="SampleData\profiles.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="SampleData\scores.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SampleData\profiles.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SampleData\scores.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
