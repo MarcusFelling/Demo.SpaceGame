@@ -7,7 +7,7 @@
     <testsuite>
       <xsl:attribute name="tests"><xsl:value-of select="count($times)" /></xsl:attribute>
       <xsl:attribute name="failures"><xsl:value-of select="count($failures)" /></xsl:attribute> 
-      <testcase>
+      <testcase> 
           <xsl:variable name="avg-time" select="sum($times) div count($times)" />
           <xsl:attribute name="name">Average Response Time</xsl:attribute>
           <xsl:attribute name="time"><xsl:value-of select="format-number($avg-time div 1000,'#.##')"/></xsl:attribute>
