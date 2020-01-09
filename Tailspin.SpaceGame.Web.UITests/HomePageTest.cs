@@ -14,7 +14,7 @@ namespace UITests
     [TestFixture("IE")]
     public class HomePageTest
     {
-        private string browser;
+        private string browser; 
         private IWebDriver driver;
 
         public HomePageTest(string browser)
