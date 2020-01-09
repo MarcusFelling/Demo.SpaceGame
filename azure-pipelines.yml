@@ -342,7 +342,7 @@ stages:
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
   dependsOn: Test
-  condition: succeeded('Test')
+  condition: and(succeeded('Test'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
   jobs:
   - deployment: Deploy
     pool:
@@ -398,7 +398,7 @@ stages:
 - stage: 'Prod'
   displayName: 'Deploy to the Production environment'
   dependsOn: Staging
-  condition: succeeded('Staging')
+  condition: and(succeeded('Staging'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
   jobs:
   - deployment: Deploy
     pool:
