@@ -1,3 +1,4 @@
+name: $(Major).$(Minor).$(Patch)
 variables:
   buildConfiguration: 'Release'
   dotnetSdkVersion: '2.1.505'
@@ -6,6 +7,9 @@ variables:
   appID: '26178'
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+  Major: '1'
+  Minor: '1'
+  Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
   
 stages:
 - stage: 'Build'
