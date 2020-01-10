@@ -10,7 +10,19 @@ variables:
   Major: '1'
   Minor: '1'
   Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
-  
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: Demo/Demo.Templates
+
+stages:
+- stage: 'Build'
+  displayName: 'Template Example'
+jobs:
+- template: common.yml@templates  # Template reference
+
 stages:
 - stage: 'Build'
   displayName: 'Build the web application'
