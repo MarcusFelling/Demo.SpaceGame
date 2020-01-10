@@ -23,7 +23,6 @@ stages:
 jobs:
 - template: common.yml@templates  # Template reference
 
-stages:
 - stage: 'Build'
   displayName: 'Build the web application'
   jobs: 
