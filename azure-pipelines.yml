@@ -18,7 +18,7 @@ resources:
       name: Demo/Demo.Templates
 
 stages:
-- stage: 'Build'
+- stage: 'Use Template'
   displayName: 'Template Example'
   jobs:
   - template: common.yml@templates  # Template reference
