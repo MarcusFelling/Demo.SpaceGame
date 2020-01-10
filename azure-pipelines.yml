@@ -20,8 +20,8 @@ resources:
 stages:
 - stage: 'Build'
   displayName: 'Template Example'
-jobs:
-- template: common.yml@templates  # Template reference
+  jobs:
+  - template: common.yml@templates  # Template reference
 
 - stage: 'Build'
   displayName: 'Build the web application'
