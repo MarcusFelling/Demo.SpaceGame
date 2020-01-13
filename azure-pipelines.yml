@@ -323,7 +323,12 @@ stages:
       vmImage: 'windows-2019'
     variables:    
     - group: 'Release'
-    steps: 
+    steps:
+    - task: PowerShell@2
+      displayName: 'Output Chrome version installed on hosted-agent, to align ChromeDriver version in UI tests'
+      inputs:
+        targetType: 'inline'
+        script: '(Get-Item (Get-ItemProperty ''HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'').''(Default)'').VersionInfo'
     - task: DotNetCoreInstaller@0
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
