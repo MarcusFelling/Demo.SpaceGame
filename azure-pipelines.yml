@@ -37,7 +37,7 @@ stages:
       inputs:
         command: custom
         custom: tool
-        arguments: 'install --global dotnet-reportgenerator-globaltool --version 4.5.8'
+        arguments: 'install --global --framework netcoreapp2.1 dotnet-reportgenerator-globaltool --version 4.5.8'
     - task: Npm@1
       displayName: 'Run npm install'
       inputs:
