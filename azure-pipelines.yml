@@ -1,6 +1,7 @@
 name: $(Major).$(Minor).$(Patch)
 variables:
   buildConfiguration: 'Release'
+  dotnetSdkVersion: '3.1.100'
   serviceConnection: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game-web'
   appID: '26178'
@@ -32,12 +33,16 @@ stages:
       demands:
         - npm
     steps:
+    - task: DotNetCoreInstaller@0
+      displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
+      inputs:
+        version: '$(dotnetSdkVersion)'
     - task: DotNetCoreCLI@2
       displayName: 'Install ReportGenerator'
       inputs:
         command: custom
         custom: tool
-        arguments: 'install --global --framework netcoreapp2.1 dotnet-reportgenerator-globaltool --version 4.5.8'
+        arguments: 'install --global dotnet-reportgenerator-globaltool'
     - task: Npm@1
       displayName: 'Run npm install'
       inputs:
@@ -335,6 +340,10 @@ stages:
       inputs:
         targetType: 'inline'
         script: '(Get-Item (Get-ItemProperty ''HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'').''(Default)'').VersionInfo'
+    - task: DotNetCoreInstaller@0
+      displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
+      inputs:
+        version: '$(dotnetSdkVersion)'
     - task: DotNetCoreCLI@2
       displayName: 'Build the project - $(buildConfiguration)'
       inputs:
@@ -447,6 +456,10 @@ stages:
     variables:
     - group: 'Release'
     steps: 
+    - task: DotNetCoreInstaller@0
+      displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
+      inputs:
+        version: '$(dotnetSdkVersion)'
     - task: DotNetCoreCLI@2
       displayName: 'Build the project - $(buildConfiguration)'
       inputs:
