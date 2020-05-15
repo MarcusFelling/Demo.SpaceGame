@@ -1,7 +1,7 @@
 name: $(Major).$(Minor).$(Patch)
 variables:
   buildConfiguration: 'Release'
-  dotnetSdkVersion: '2.1.505'
+  dotnetSdkVersion: '3.1.100'
   serviceConnection: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game-web'
   appID: '26178'
@@ -10,8 +10,19 @@ variables:
   Major: '1'
   Minor: '1'
   Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
-  
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: Demo/Demo.Templates
+
 stages:
+- stage: 'UseTemplate'
+  displayName: 'Template Example'
+  jobs:
+  - template: common.yml@templates  # Template reference
+
 - stage: 'Build'
   displayName: 'Build the web application'
   jobs: 
