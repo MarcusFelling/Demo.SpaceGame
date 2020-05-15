@@ -1,7 +1,7 @@
 name: $(Major).$(Minor).$(Patch)
 variables:
   buildConfiguration: 'Release'
-  dotnetSdkVersion: '2.1.505'
+  dotnetSdkVersion: '3.1.100'
   serviceConnection: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game-web'
   appID: '26178'
@@ -33,9 +33,10 @@ stages:
       demands:
         - npm
     steps:
-    - task: DotNetCoreInstaller@0
+    - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
+        packageType: sdk
         version: '$(dotnetSdkVersion)'
     - task: DotNetCoreCLI@2
       displayName: 'Install ReportGenerator'
@@ -340,9 +341,10 @@ stages:
       inputs:
         targetType: 'inline'
         script: '(Get-Item (Get-ItemProperty ''HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'').''(Default)'').VersionInfo'
-    - task: DotNetCoreInstaller@0
+    - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
+        packageType: sdk
         version: '$(dotnetSdkVersion)'
     - task: DotNetCoreCLI@2
       displayName: 'Build the project - $(buildConfiguration)'
@@ -456,9 +458,10 @@ stages:
     variables:
     - group: 'Release'
     steps: 
-    - task: DotNetCoreInstaller@0
+    - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
+        packageType: sdk
         version: '$(dotnetSdkVersion)'
     - task: DotNetCoreCLI@2
       displayName: 'Build the project - $(buildConfiguration)'
