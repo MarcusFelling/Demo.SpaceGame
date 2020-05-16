@@ -18,21 +18,17 @@ resources:
       name: Demo/Demo.Templates
 
 stages:
-- stage: 'UseTemplate'
-  displayName: 'Template Example'
-  jobs:
-  - template: common.yml@templates  # Template reference
-
 - stage: 'Build'
   displayName: 'Build the web application'
   jobs: 
   - job: 'Build'
     displayName: 'Build job'
     pool:
-      vmImage: 'Ubuntu-16.04'
+      vmImage: 'vs2017-win2016'
       demands:
         - npm
     steps:
+    - template: common.yml@templates  # Template reference    
     - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
