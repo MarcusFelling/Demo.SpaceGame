@@ -11,11 +11,12 @@ variables:
   Minor: '1'
   Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
 
+# Import template repo: https://github.com/MarcusFelling/Demo.Templates.git
 resources:
   repositories:
     - repository: templates
-      type: git
-      name: Demo/Demo.Templates
+      type: github
+      name: MarcusFelling/Demo.Templates
 
 stages:
 - stage: 'Build'
