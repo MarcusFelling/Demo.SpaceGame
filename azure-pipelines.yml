@@ -28,7 +28,7 @@ stages:
       demands:
         - npm
     steps:
-    - template: common.yml@templates  # Template reference    
+    - template: required-security.yml@templates  # Template reference    
     - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
