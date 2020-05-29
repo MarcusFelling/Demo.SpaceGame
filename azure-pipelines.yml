@@ -31,7 +31,7 @@ stages:
     steps:
     - template: required-security.yml@templates  # Template reference
       parameters:
-        bypass: false     
+        bypass: $(bypass)     
 
     - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
