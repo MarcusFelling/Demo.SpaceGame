@@ -27,8 +27,12 @@ stages:
       vmImage: 'vs2017-win2016'
       demands:
         - npm
+extends:
+    template: required-security.yml@templates  # Template reference
+    parameters:
+        bypass: false 
+        
     steps:
-    - template: required-security.yml@templates  # Template reference    
     - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
