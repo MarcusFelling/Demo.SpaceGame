@@ -14,7 +14,7 @@ namespace UITests
     [TestFixture("IE")]
     public class HomePageTest
     {
-        private string browser; 
+        private string browser;
         private IWebDriver driver;
 
         public HomePageTest(string browser)
@@ -27,25 +27,26 @@ namespace UITests
         {
             try
             {
-                // The NuGet package for each browser installs driver software
-                // under the bin directory, alongside the compiled test code.
-                // This tells the driver class where to find the underlying driver software.
-                var cwd = Environment.CurrentDirectory;
-
                 // Create the driver for the current browser.
-                switch(browser)
+                // get driver path for hosted MS Agent (windows-2019, vs2017-win2016)
+                string envWebDriver = null;
+
+                switch (browser)
                 {
-                  case "Chrome":
-                    driver = new ChromeDriver(cwd);
-                    break;
-                  case "Firefox":
-                    driver = new FirefoxDriver(cwd);
-                    break;
-                  case "IE":
-                    driver = new InternetExplorerDriver(cwd);
-                    break;
-                  default:
-                    throw new ArgumentException($"'{browser}': Unknown browser");
+                    case "Chrome":
+                        envWebDriver = Environment.GetEnvironmentVariable("ChromeWebDriver");
+                        driver = new ChromeDriver(envWebDriver);
+                        break;
+                    case "Firefox":
+                        envWebDriver = Environment.GetEnvironmentVariable("GeckoWebDriver");
+                        driver = new FirefoxDriver(envWebDriver);
+                        break;
+                    case "IE":
+                        envWebDriver = Environment.GetEnvironmentVariable("IEWebDriver");
+                        driver = new InternetExplorerDriver(envWebDriver);
+                        break;
+                    default:
+                        throw new ArgumentException($"'{browser}': Unknown browser");
                 }
 
                 // Wait until the page is fully loaded on every page navigation or page reload.
@@ -59,7 +60,7 @@ namespace UITests
 
                 // Wait for the page to be completely loaded.
                 new WebDriverWait(driver, TimeSpan.FromSeconds(10))
-                    .Until(d => ((IJavaScriptExecutor) d)
+                    .Until(d => ((IJavaScriptExecutor)d)
                         .ExecuteScript("return document.readyState")
                         .Equals("complete"));
             }
@@ -71,7 +72,7 @@ namespace UITests
                 Cleanup();
             }
         }
-    
+
         [OneTimeTearDown]
         public void Cleanup()
         {
@@ -117,7 +118,7 @@ namespace UITests
             {
                 // Click the close button that's part of the modal.
                 ClickElement(FindElement(By.ClassName("close"), modal));
-                
+
                 // Wait for the modal to close and for the main page to again be clickable.
                 FindElement(By.TagName("body"));
             }
