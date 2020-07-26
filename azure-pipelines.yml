@@ -112,7 +112,7 @@ stages:
         artifactName: dropDacpac
       condition: succeededOrFailed()
 
-- stage: 'Deploy'
+- stage: 'Dev'
   displayName: 'Deploy to the dev environment'
   dependsOn:
   - Build
