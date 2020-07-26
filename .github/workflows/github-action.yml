@@ -5,11 +5,11 @@ on: push
 
 env:
   buildConfiguration: 'Release'
-  dotnetSdkVersion: '3.1.100'
   serviceConnection: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game-web'
   appID: '26178'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+  environmentName: 'Dev'
 
 jobs:
   build:
@@ -58,12 +58,9 @@ jobs:
         # Destination path
         path: ${{ github.workspace }}
     
-    - name: Azure Functions Action
-      uses: Azure/functions-action@v1.1.4
+    - name: 'Deploy to Azure WebApp'
+      uses: azure/webapps-deploy@v2
       with:
-        # Name of the Azure Function App, value set as repo secret
-        app-name: ${{ secrets.APP_NAME }}
-        # Path to package or folder. *.zip or a folder to deploy
-        package: drop.zip
-        # Publish profile (*.publishsettings) file contents with web deploy secrets, contents set as repo secret
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        app-name: ${{ env.appName }}-${{ env.environmentName }}-${{ env.ID }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ${{ github.workspace }}/*zip
