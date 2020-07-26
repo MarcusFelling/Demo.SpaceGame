@@ -33,14 +33,14 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
         
-      - name: Build
-        run: dotnet build --configuration ${{ env.buildConfiguration }} --no-restore
+      - name: Build web project
+        run: dotnet build "${{ github.workspace }}\Demo.SpaceGame\Demo.SpaceGame\Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj" --configuration ${{ env.buildConfiguration }} --no-restore
       
       - name: Test
         run: dotnet test --no-restore --verbosity normal
    
       - name: publish
-        run: dotnet publish --no-build --configuration ${{ env.buildConfiguration }} --output ${{ github.workspace }}/${{ env.buildConfiguration }})
+        run: dotnet publish "${{ github.workspace }}\Demo.SpaceGame\Demo.SpaceGame\Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj" --no-build --configuration ${{ env.buildConfiguration }} --output ${{ github.workspace }}/${{ env.buildConfiguration }})
         
         # Publish zip as build artifact
       - name: Upload a Build Artifact
