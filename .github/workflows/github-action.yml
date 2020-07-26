@@ -40,14 +40,14 @@ jobs:
         run: dotnet test "${{ github.workspace }}\Tailspin.SpaceGame.Web.Tests\Tailspin.SpaceGame.Web.Tests.csproj" --no-restore --verbosity normal
    
       - name: publish
-        run: dotnet publish "${{ github.workspace }}\Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj" --no-build --configuration ${{ env.buildConfiguration }} --output ${{ github.workspace }}\${{ env.buildConfiguration }}
+        run: dotnet publish "${{ github.workspace }}\Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj" --no-build --configuration ${{ env.buildConfiguration }} --output ${{ github.workspace }}\${{ env.buildConfiguration }}\Artifact
         
         # Publish zip as build artifact
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2
         with:
           name: drop
-          path: ${{ github.workspace }}\${{ env.buildConfiguration }}\*.zip
+          path: ${{ github.workspace }}\${{ env.buildConfiguration }}\Artifact\*
   
   deploy:
     runs-on: ubuntu-latest
