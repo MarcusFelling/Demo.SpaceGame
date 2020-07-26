@@ -24,8 +24,11 @@ jobs:
       - name: Compile Sass assets
         run: ./node_modules/.bin/node-sass ${{ env.wwwrootDir }} --output ${{ env.wwwrootDir }}
 
+      - name: Install Gulp CLI
+        run: npm install gulp-cli
+        
       - name: Run Gulp tasks
-        run: --gulpfile "${{ github.workspace }}\gulpfile.js"
+        run: gulp --gulpfile "${{ github.workspace }}\gulpfile.js"
           
       - name: Install dependencies
         run: dotnet restore
