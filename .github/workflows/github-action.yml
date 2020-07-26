@@ -1,0 +1,69 @@
+name: MarcusFelling.Demo.SpaceGame
+
+# Trigger on push
+on: push
+
+env:
+  buildConfiguration: 'Release'
+  dotnetSdkVersion: '3.1.100'
+  serviceConnection: 'tailspin-space-game-rg'
+  appName: 'tailspin-space-game-web'
+  appID: '26178'
+  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+
+jobs:
+  build:
+    runs-on: windows-2016
+    steps:
+      # Download source code to agent
+      - uses: actions/checkout@v2
+
+      - name: Run npm install
+        run: npm install
+
+      - name: Compile Sass assets
+        run: ./node_modules/.bin/node-sass ${{ env.wwwrootDir }} --output ${{ env.wwwrootDir }}
+
+      - name: Run Gulp tasks
+        run: --gulpfile "${{ github.workspace }}\gulpfile.js"
+          
+      - name: Install dependencies
+        run: dotnet restore
+        
+      - name: Build
+        run: dotnet build --configuration ${{ env.buildConfiguration }} --no-restore
+      
+      - name: Test
+        run: dotnet test --no-restore --verbosity normal
+   
+      - name: publish
+        run: dotnet publish --no-build --configuration ${{ env.buildConfiguration }} --output ${{ github.workspace }}/${{ env.buildConfiguration }})
+        
+        # Publish zip as build artifact
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: drop
+          path: ${{ env.buildConfiguration }}/*.zip
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Download a Build Artifact
+      uses: actions/download-artifact@v2
+      with:
+        # Artifact name
+        name: drop
+        # Destination path
+        path: ${{ github.workspace }}
+    
+    - name: Azure Functions Action
+      uses: Azure/functions-action@v1.1.4
+      with:
+        # Name of the Azure Function App, value set as repo secret
+        app-name: ${{ secrets.APP_NAME }}
+        # Path to package or folder. *.zip or a folder to deploy
+        package: drop.zip
+        # Publish profile (*.publishsettings) file contents with web deploy secrets, contents set as repo secret
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
