@@ -1,7 +1,6 @@
 name: $(Major).$(Minor).$(Patch)
 variables:
   buildConfiguration: 'Release'
-  dotnetSdkVersion: '3.1.100'
   serviceConnection: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game-web'
   appID: '26178'
@@ -21,12 +20,6 @@ stages:
       demands:
         - npm
     steps:
-    - task: DotNetCoreInstaller@2
-      displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
-      inputs:
-        packageType: sdk
-        version: '$(dotnetSdkVersion)'
-        
     - task: Npm@1
       displayName: 'Run npm install'
       inputs:
