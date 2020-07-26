@@ -40,7 +40,7 @@ jobs:
         run: dotnet build "${{ github.workspace }}\Tailspin.SpaceGame.Web.Tests\Tailspin.SpaceGame.Web.Tests.csproj" --configuration ${{ env.buildConfiguration }} --no-restore
         
       - name: Test
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test "${{ github.workspace }}\Tailspin.SpaceGame.Web.Tests\Tailspin.SpaceGame.Web.Tests.csproj" --no-restore --verbosity normal
    
       - name: publish
         run: dotnet publish "${{ github.workspace }}\Demo.SpaceGame\Demo.SpaceGame\Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj" --no-build --configuration ${{ env.buildConfiguration }} --output ${{ github.workspace }}/${{ env.buildConfiguration }})
