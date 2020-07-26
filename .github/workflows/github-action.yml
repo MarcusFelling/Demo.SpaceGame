@@ -34,10 +34,10 @@ jobs:
         run: dotnet restore
         
       - name: Build web project
-        run: dotnet build "${{ github.workspace }}\Demo.SpaceGame\Demo.SpaceGame\Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj" --configuration ${{ env.buildConfiguration }} --no-restore
+        run: dotnet build "${{ github.workspace }}\Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj" --configuration ${{ env.buildConfiguration }} --no-restore
 
       - name: Build test project
-        run: dotnet build "${{ github.workspace }}\Demo.SpaceGame\Demo.SpaceGame\Tailspin.SpaceGame.Web.Tests\Tailspin.SpaceGame.Web.Tests.csproj" --configuration ${{ env.buildConfiguration }} --no-restore
+        run: dotnet build "${{ github.workspace }}\Tailspin.SpaceGame.Web.Tests\Tailspin.SpaceGame.Web.Tests.csproj" --configuration ${{ env.buildConfiguration }} --no-restore
         
       - name: Test
         run: dotnet test --no-restore --verbosity normal
