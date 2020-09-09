@@ -348,7 +348,7 @@ stages:
     dependsOn: Deploy
     displayName: 'Run load tests'
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'ubuntu-latest'
     variables:
       jmeterVersion: '5.2'
     steps: 
