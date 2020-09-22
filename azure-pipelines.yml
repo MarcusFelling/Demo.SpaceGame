@@ -15,9 +15,9 @@ variables:
 
 resources:
   repositories:
-    - repository: templates #TODO: switch to bitbucket
-      type: git
-      name: Demo/Demo.Templates
+    - repository: templates 
+      type: github
+      name: MarcusFelling/Demo.Templates
 
 stages:
 - stage: 'Build'
@@ -28,9 +28,6 @@ stages:
       demands:
         - npm
     steps:
-    - template: required-security.yml@templates
-      parameters:
-        bypass: $(bypass)
     - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
