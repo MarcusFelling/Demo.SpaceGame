@@ -41,12 +41,14 @@ stages:
       inputs:
         packageType: sdk
         version: '$(dotnetSdkVersion)'
+        
     - task: DotNetCoreCLI@2
       displayName: 'Install ReportGenerator'
       inputs:
         command: custom
         custom: tool
         arguments: 'install --global dotnet-reportgenerator-globaltool'
+        
     - task: Npm@1
       displayName: 'Run npm install'
       inputs:
