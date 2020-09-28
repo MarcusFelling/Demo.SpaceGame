@@ -1,94 +1,389 @@
-steps:
-# Download artifacts for web app and terraform
-- download: current
-  displayName: App Download
-  artifact: dropApp
-- download: current
-  displayName: Terraform Download
-  artifact: dropTerraform
-- task: AzureCLI@1
-  displayName: 'Deploy Terraform State Storage'
-  inputs:
-    azureSubscription: '$(serviceConnection)'
-    scriptLocation: inlineScript
-    inlineScript: |
-      call az group create --location centralus --name $(terraformstoragerg)
-      call az storage account create --name $(terraformstorageaccount) --resource-group $(terraformstoragerg) --location centralus --sku Standard_LRS
-      call az storage container create --name terraform --account-name $(terraformstorageaccount)
-      call az storage account keys list -g $(terraformstoragerg) -n $(terraformstorageaccount)
-- task: AzurePowerShell@3
-  displayName: 'Get Terraform State Storage Key'
-  inputs:
-    azureSubscription: '$(serviceConnection)'
-    ScriptType: 'InlineScript'
-    Inline: |
-      # Using this script we will fetch storage key which is required in terraform file to authenticate backend storage account
-      $key=(Get-AzureRmStorageAccountKey -ResourceGroupName $(terraformstoragerg) -AccountName $(terraformstorageaccount)).Value[0]
-      Write-Host "##vso[task.setvariable variable=storagekey]$key"
-    azurePowerShellVersion: 'LatestVersion'
-- task: replacetokens@3
-  displayName: 'Replace Tokens with Variables'
-  inputs:
-    targetFiles: '$(Pipeline.Workspace)/dropTerraform/Tailspin.SpaceGame.Terraform/*.tf'
-    encoding: 'auto'
-    writeBOM: true
-    escapeType: 'none'
-    actionOnMissing: 'fail'
-    keepToken: false
-    tokenPrefix: '__'
-    tokenSuffix: '__'
-    useLegacyPattern: false
-    enableTelemetry: true
-- task: TerraformInstaller@0
-  inputs:
-    terraformVersion: '0.12.3'
-  
-- script: terraform fmt -check
-  displayName: Terraform Format
+name: $(Major).$(Minor).$(Patch)
+trigger:
+- master
+pr:
+  branches:
+    include:
+    - master
 
-- task: TerraformTaskV1@0
-  displayName: 'Terraform : init'
-  inputs:
-    provider: 'azurerm'
-    command: 'init'
-    workingDirectory: '$(Pipeline.Workspace)/dropTerraform/Tailspin.SpaceGame.Terraform/'
-    backendServiceArm: $(serviceConnection)
-    backendAzureRmResourceGroupName: '$(terraformstoragerg)'
-    backendAzureRmStorageAccountName: '$(terraformstorageaccount)'
-    backendAzureRmContainerName: 'terraform'
-    backendAzureRmKey: '$(System.StageName).terraform.tfstate'
-- task: TerraformTaskV1@0
-  displayName: 'Terraform : plan'
-  inputs:
-    command: plan
-    workingDirectory: '$(Pipeline.Workspace)/dropTerraform/Tailspin.SpaceGame.Terraform/'
-    environmentServiceNameAzureRM: $(serviceConnection)
-    backendAzureRmResourceGroupName: '$(terraformstoragerg)'
-    backendAzureRmStorageAccountName: '$(terraformstorageaccount) '
-    backendAzureRmContainerName: terraform
-    backendAzureRmKey: '$(storagekey)'
-- task: TerraformTaskV1@0
-  displayName: 'Terraform : apply -auto-approve'
-  inputs:
-    command: apply
-    workingDirectory: '$(Pipeline.Workspace)/dropTerraform/Tailspin.SpaceGame.Terraform/'
-    commandOptions: '-auto-approve'
-    environmentServiceNameAzureRM: $(serviceConnection)
-    backendAzureRmResourceGroupName: '$(terraformstoragerg)'
-    backendAzureRmStorageAccountName: '$(terraformstorageaccount) '
-    backendAzureRmContainerName: terraform
-    backendAzureRmKey: '$(storagekey)'
-- task: AzureWebApp@1
-  displayName: 'Azure App Service Deploy: website'
-  inputs:
-    azureSubscription: '$(serviceConnection)'
-    appName: '$(appservicename)'
-    package: '$(Pipeline.Workspace)/dropApp/$(buildConfiguration)/*.zip'
-- task: AzureCLI@2
-  displayName: 'Set connection string'
-  inputs:
-    azureSubscription: '$(serviceConnection)'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: |
-      az webapp config connection-string set --name $(appservicename) --resource-group $(appresourcegroup) --connection-string-type SQLAzure --settings "DefaultConnection=Server=tcp:$(servername).database.windows.net,1433;Initial Catalog=$(databasename);Persist Security Info=False;User ID=$(adminlogin);Password=$(adminPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+variables:
+  Major: '1'
+  Minor: '1'
+  Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
+  buildConfiguration: 'Release'
+  dotnetSdkVersion: '3.1.100'
+  appresourcegroup: $(appName)-$(System.StageName)-rg
+  serviceConnection: SpaceGame-NonProd
+  dbresourcegroup: 'tailspin-space-game-rg'
+  appName: 'tailspin-space-game'
+  appID: '26178'
+  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
+  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+
+resources:
+  repositories:
+    - repository: templates 
+      type: github
+      name: MarcusFelling/Demo.Templates
+      endpoint: templates
+
+stages:
+- stage: 'Build'
+  jobs: 
+  - job: 'BuildApp'
+    pool:
+      vmImage: 'vs2017-win2016'
+      demands:
+        - npm
+    steps:
+    - task: DotNetCoreInstaller@2
+      displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
+      inputs:
+        packageType: sdk
+        version: '$(dotnetSdkVersion)'
+    - task: DotNetCoreCLI@2
+      displayName: 'Install ReportGenerator'
+      inputs:
+        command: custom
+        custom: tool
+        arguments: 'install --global dotnet-reportgenerator-globaltool'
+    - task: Npm@1
+      displayName: 'Run npm install'
+      inputs:
+        verbose: false
+
+    - script: './node_modules/.bin/node-sass $(wwwrootDir) --output $(wwwrootDir)'
+      displayName: 'Compile Sass assets'
+
+    - task: gulp@1
+      displayName: 'Run gulp tasks'
+
+    - script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
+      displayName: 'Write build info'
+      workingDirectory: $(wwwrootDir)
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore project dependencies'
+      inputs:
+        command: 'restore'
+        projects: '**/*.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build the project - $(buildConfiguration)'
+      inputs:
+        command: 'build'
+        arguments: '--no-restore --configuration $(buildConfiguration)'
+        projects: '**/*.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Run unit tests - $(buildConfiguration)'
+      inputs:
+        command: 'test'
+        arguments: '--no-build --configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
+        publishTestResults: true
+        projects: '**/*.Tests.csproj'
+        testRunTitle: 'Unit Tests'
+
+    - script: |
+        reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines
+      displayName: 'Create code coverage report'
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage report'
+      inputs:
+        codeCoverageTool: 'cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish the project - $(buildConfiguration)'
+      inputs:
+        command: 'publish'
+        projects: '**/Tailspin.SpaceGame.Web.csproj'
+        publishWebProjects: false
+        arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
+        zipAfterPublish: true
+
+    - publish: '$(Build.ArtifactStagingDirectory)'
+      artifact: dropApp
+
+  - job: BuildDacpac
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore project dependencies'
+      inputs:
+        command: 'restore'
+        projects: '**/*.csproj'
+
+    - task: VSBuild@1
+      displayName: 'Build the database project'
+      inputs:
+        project: '**/*.sqlproj'
+
+    - task: CopyFiles@2
+      displayName: 'Copy dacpac file to staging directory'
+      inputs:
+        contents: |
+          Tailspin.SpaceGame.Database/bin/**/*.dacpac
+        targetFolder: '$(Build.StagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: dropDacpac
+      condition: succeededOrFailed()
+
+  - job: BuildTerraform
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+    - task: CopyFiles@2
+      displayName: 'Copy .tf files to staging directory'
+      inputs:
+        contents: |
+          Tailspin.SpaceGame.Terraform/**/*.tf
+        targetFolder: '$(Build.StagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: dropTerraform
+      condition: succeededOrFailed()
+
+- stage: DBAVerificationScript
+  displayName: 'Script database schema changes'
+  dependsOn: Build
+  jobs:
+  - deployment: DBAVerificationScript
+    pool:
+      vmImage: 'windows-2019'
+    variables:
+    - group: SpaceGame
+    environment: 'dbaverificationscript'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: dropDacpac
+            patterns: '**/*'
+          - task: SqlAzureDacpacDeployment@1
+            displayName: Generate schema change script
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              authenticationType: 'server'
+              serverName: '$(servername).database.windows.net'
+              databaseName: '$(databasename)'
+              sqlUsername: '$(adminlogin)'
+              sqlPassword: '$(adminPassword)'
+              deployType: 'DacpacTask'
+              deploymentAction: 'Script'
+              dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
+              ipDetectionMethod: 'AutoDetect'
+          - task: PowerShell@2
+            displayName: Show Auto Generated SQL Script
+            inputs:
+              targetType: 'inline'
+              script: | 
+                Write-Host "Auto Generated SQL Update Script:"
+                Get-Content $(Build.SourcesDirectory)\GeneratedOutputFiles\$(databasename)_Script.sql | foreach {Write-Output $_}
+          - task: PowerShell@2
+            displayName: Show change script and check for schema changes
+            inputs:
+              targetType: 'inline'
+              script: | 
+                # Print the schema change script
+                Write-Host "Auto Generated SQL Update Script:"
+                Get-Content $(Build.SourcesDirectory)\GeneratedOutputFiles\$(databasename)_Script.sql | foreach {Write-Output $_}
+
+                # Check for schema changes
+                $file = Get-Content "$(Build.SourcesDirectory)\GeneratedOutputFiles\$(databasename)_Script.sql"
+                $containsWord = $file | %{$_ -match "CREATE" -or $_ -match "ALTER" -or $_ -match "DROP"}
+                if ($containsWord -contains $true) {
+                  Install-Module VSTeam -Scope CurrentUser -Force
+                  Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
+                  $methodParameters = @{
+                    ProjectName = "$(System.TeamProject)"
+                    Name = "SpaceGame"}
+                  $vg = Get-VSTeamVariableGroup @methodParameters
+                  $vars = @{}
+                  $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
+                  $varName = "schemaChanged"
+                  $vars.$varName= @{}
+                  $vars.$varName.value = "True"
+                  $vars.$varName.isSecret = $false
+                  $methodParameters = @{
+                    id = $vg.id
+                    ProjectName = "$(System.TeamProject)"
+                    Name = "SpaceGame"
+                    Description = ""
+                    Type = "Vsts"
+                    Variables = $vars}
+                  Update-VSTeamVariableGroup @methodParameters}
+
+- stage: DBAVerificationApply
+  variables: 
+    - group: SpaceGame
+  displayName: 'Apply database schema changes'
+  dependsOn: DBAVerificationScript
+  condition: and(succeeded('DBAVerificationScript'), eq(variables['schemaChanged'], True))
+  jobs:
+  - deployment: DBAVerificationApply
+    pool:
+      vmImage: 'windows-2019'
+    variables:
+    - group: SpaceGame
+    environment: 'dbaverificationapply'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: dropDacpac
+            patterns: '**/*'
+          - task: SqlAzureDacpacDeployment@1
+            displayName: 'Deploy SQL schema'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              authenticationType: 'server'
+              serverName: '$(servername).database.windows.net'
+              databaseName: '$(databasename)'
+              sqlUsername: '$(adminlogin)'
+              sqlPassword: '$(adminPassword)'
+              deployType: 'DacpacTask'
+              deploymentAction: 'Publish'
+              dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
+              ipDetectionMethod: 'AutoDetect'
+          - task: PowerShell@2
+            displayName: 'Remove "schemaChanged" pipeline variable'
+            inputs:
+              targetType: 'inline'
+              script: | 
+                Install-Module VSTeam -Scope CurrentUser -Force
+                Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
+                $methodParameters = @{
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "SpaceGame"}
+                $vg = Get-VSTeamVariableGroup  @methodParameters 
+                $vars = @{}
+                $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
+                $vars.Remove("schemaChanged")
+                $methodParameters = @{
+                  id = $vg.id
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "SpaceGame"
+                  Description = ""
+                  Type = "Vsts"
+                  Variables = $vars}
+                Update-VSTeamVariableGroup @methodParameters
+
+- stage: 'Dev'
+  displayName: 'Deploy to the dev environment'
+  dependsOn:
+  - DBAVerificationScript
+  - DBAVerificationApply
+  condition: |
+    and
+    (
+      succeeded('DBAVerificationScript'),
+      in(dependencies.DBAVerificationApply.result, 'Succeeded', 'Skipped')
+    )
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'windows-2019'
+    environment: dev
+    variables:
+    - group: SpaceGame
+    - group: TerraformBackend
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: spacegame-deploy.yml@templates
+
+- stage: 'Test'
+  displayName: 'Deploy to the test environment'
+  dependsOn: Dev
+  condition: and(succeeded('Dev'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'windows-2019'
+    environment: test
+    variables:
+    - group: SpaceGame
+    - group: TerraformBackend
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: spacegame-deploy.yml@templates
+  - job: RunUITests
+    dependsOn: Deploy
+    displayName: 'Run UI tests'
+    pool:
+      vmImage: 'vs2017-win2016'
+    variables:    
+    - group: SpaceGame
+    steps:
+    - template: functional-tests.yml@templates
+
+- stage: 'Staging'
+  displayName: 'Deploy to the staging environment'
+  dependsOn: Test
+  condition: and(succeeded('Test'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'windows-2019'
+    environment: staging
+    variables:
+    - group: SpaceGame
+    - group: TerraformBackend
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: spacegame-deploy.yml@templates
+  - job: RunLoadTests
+    dependsOn: Deploy
+    displayName: 'Run load tests'
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables:
+      jmeterVersion: '5.2'
+    steps: 
+    - template: load-tests.yml@templates
+
+- stage: 'Prod'
+  displayName: 'Deploy to the Production environment'
+  dependsOn: Staging
+  condition: and(succeeded('Staging'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'windows-2019'
+    environment: prod
+    variables:
+    - group: SpaceGame
+    - group: TerraformBackend
+    - name:  serviceConnection
+      value: SpaceGame-Prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: spacegame-deploy.yml@templates            
+  - job: RunUITests
+    dependsOn: Deploy
+    displayName: 'Run UI tests'
+    pool:
+      vmImage: 'vs2017-win2016'
+    variables:
+    - group: SpaceGame
+    steps: 
+    - template: functional-tests.yml@templates
