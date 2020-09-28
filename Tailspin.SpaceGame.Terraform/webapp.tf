@@ -15,12 +15,12 @@ features {}
 
 resource "azurerm_resource_group" "rg" {
   name     = "__appresourcegroup__"
-  location = "West US 2"
+  location = "West US"
 }
 
 resource "azurerm_app_service_plan" "serviceplan" {
   name                = "__appserviceplan__-__system.stagename__"
-  location            = "West US 2"
+  location            = "West US"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   kind                = "App"
 
