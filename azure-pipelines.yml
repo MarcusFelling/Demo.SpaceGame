@@ -5,7 +5,7 @@ pr:
   branches:
     include:
     - master
-
+    
 variables:
   Major: '1'
   Minor: '1'
@@ -19,7 +19,7 @@ variables:
   appID: '26178'
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
-
+ 
 resources:
   repositories:
     - repository: templates 
