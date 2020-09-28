@@ -17,7 +17,8 @@ resources:
   repositories:
     - repository: templates 
       type: github
-      name: Templates
+      name: MarcusFelling/Demo.Templates
+      endpoint: templates
 
 stages:
 - stage: 'Build'
