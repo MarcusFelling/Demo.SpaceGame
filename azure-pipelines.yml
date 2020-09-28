@@ -35,6 +35,7 @@ stages:
       vmImage: 'vs2017-win2016'
       demands:
         - npm
+        
     steps:
     - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
