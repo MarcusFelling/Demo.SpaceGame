@@ -1,4 +1,11 @@
 name: $(Major).$(Minor).$(Patch)
+trigger:
+- master
+pr:
+  branches:
+    include:
+    - master
+
 variables:
   Major: '1'
   Minor: '1'
@@ -301,7 +308,7 @@ stages:
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
   dependsOn: Dev
-  condition: succeeded('Dev')
+  condition: and(succeeded('Dev'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
   jobs:
   - deployment: Deploy
     pool:
