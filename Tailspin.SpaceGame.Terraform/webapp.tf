@@ -7,7 +7,7 @@
 	access_key  ="__storagekey__"
   features{}
 	}
-	}
+	} 
   provider "azurerm" {
     version = "=2.0.0"
 features {}
