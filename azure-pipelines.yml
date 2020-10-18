@@ -5,7 +5,7 @@ pr:
   branches:
     include:
     - master
-
+     
 variables:
   Major: '1'
   Minor: '1'
@@ -19,7 +19,7 @@ variables:
   appID: '26178'
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
-
+ 
 resources:
   repositories:
     - repository: templates 
@@ -35,18 +35,21 @@ stages:
       vmImage: 'vs2017-win2016'
       demands:
         - npm
+        
     steps:
     - task: DotNetCoreInstaller@2
       displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
       inputs:
         packageType: sdk
         version: '$(dotnetSdkVersion)'
+        
     - task: DotNetCoreCLI@2
       displayName: 'Install ReportGenerator'
       inputs:
         command: custom
         custom: tool
         arguments: 'install --global dotnet-reportgenerator-globaltool'
+        
     - task: Npm@1
       displayName: 'Run npm install'
       inputs:

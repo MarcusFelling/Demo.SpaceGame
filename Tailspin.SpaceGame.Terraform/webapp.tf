@@ -7,7 +7,7 @@
 	access_key  ="__storagekey__"
   features{}
 	}
-	}
+	} 
   provider "azurerm" {
     version = "=2.0.0"
 features {}
@@ -15,12 +15,12 @@ features {}
 
 resource "azurerm_resource_group" "rg" {
   name     = "__appresourcegroup__"
-  location = "Central US"
+  location = "West US"
 }
 
 resource "azurerm_app_service_plan" "serviceplan" {
   name                = "__appserviceplan__-__system.stagename__"
-  location            = "South Central US"
+  location            = "West US"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   kind                = "App"
 
