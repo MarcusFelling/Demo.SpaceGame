@@ -3,10 +3,11 @@ param skuName string = 'B1'
 param skuCapacity int = 1
 param servicePlanName string = '__appserviceplan__-__system.stagename__'
 param appServiceName string = '__appservicename__'
+param region string = resourceGroup().location
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName
-  location: resourceGroup().location
+  location: region
   sku:{
     name: skuName
     capacity: skuCapacity 
@@ -15,7 +16,7 @@ resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
 
 resource appService 'Microsoft.Web/sites@2020-06-01' = {
   name: appServiceName
-  location: resourceGroup().location
+  location: region
   properties: {
     serverFarmId: servicePlan.id
   }
