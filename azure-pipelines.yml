@@ -138,22 +138,34 @@ stages:
         artifactName: dropDacpac
       condition: succeededOrFailed()
 
-  - job: BuildTerraform
+  - job: BuildBicep
     pool:
-      vmImage: 'Ubuntu-16.04'
+      vmImage: 'ubuntu-latest'
     steps:
+    - script: |
+        # Fetch the latest Bicep CLI binary
+        curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+        # Mark it as executable
+        chmod +x ./bicep
+        # Add bicep to your PATH (requires admin)
+        sudo mv ./bicep /usr/local/bin/bicep
+        # Verify you can now access the 'bicep' command
+        bicep --help
+        # Done!
+      displayName: 'Install Bicep'
+
     - task: CopyFiles@2
-      displayName: 'Copy .tf files to staging directory'
+      displayName: 'Copy ARM Template (.json) files to staging directory'
       inputs:
         contents: |
-          Tailspin.SpaceGame.Terraform/**/*.tf
+          Tailspin.SpaceGame.Bicep/**/*.json
         targetFolder: '$(Build.StagingDirectory)'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact'
       inputs:
         pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: dropTerraform
+        artifactName: dropARM
       condition: succeededOrFailed()
 
 - stage: DBAVerificationScript
