@@ -1,7 +1,7 @@
 
 param skuName string = 'B1'
 param skuCapacity int = 1
-param region string = 'Central US' 
+param region string = 'Central US'  
 param servicePlanName string = '__appserviceplan__-__system.stagename__'
 param appServiceName string = '__appservicename__'
 
