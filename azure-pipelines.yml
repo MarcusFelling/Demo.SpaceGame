@@ -19,6 +19,7 @@ variables:
   appID: '26178'
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+  IaC: 'terraform' # bicep or terraform
  
 resources:
   repositories:
@@ -339,7 +340,7 @@ stages:
       runOnce:
         deploy:
           steps:
-          - template: spacegame-deploy.yml@templates
+          - template: spacegame-$(IaC)-deploy.yml@templates
 
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
@@ -356,7 +357,7 @@ stages:
       runOnce:
         deploy:
           steps:
-          - template: spacegame-deploy.yml@templates
+          - template: spacegame-$(IaC)-deploy.yml@templates
   - job: RunUITests
     dependsOn: Deploy
     displayName: 'Run UI tests'
@@ -382,7 +383,7 @@ stages:
       runOnce:
         deploy:
           steps:
-          - template: spacegame-deploy.yml@templates
+          - template: spacegame-$(IaC)-deploy.yml@templates
   - job: RunLoadTests
     dependsOn: Deploy
     displayName: 'Run load tests'
@@ -410,7 +411,7 @@ stages:
       runOnce:
         deploy:
           steps:
-          - template: spacegame-deploy.yml@templates            
+          - template: spacegame-$(IaC)-deploy.yml@templates           
   - job: RunUITests
     dependsOn: Deploy
     displayName: 'Run UI tests'
