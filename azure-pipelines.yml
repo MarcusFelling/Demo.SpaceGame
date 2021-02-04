@@ -138,40 +138,6 @@ stages:
         artifactName: dropDacpac
       condition: succeededOrFailed()
 
-  - job: BuildBicep
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - script: |
-        # Fetch the latest Bicep CLI binary
-        curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
-        # Mark it as executable
-        chmod +x ./bicep
-        # Add bicep to your PATH (requires admin)
-        sudo mv ./bicep /usr/local/bin/bicep
-        # Verify you can now access the 'bicep' command
-        bicep --help
-        # Done!
-      displayName: 'Install Bicep'
-      
-    - script: |
-        bicep build Tailspin.SpaceGame.Bicep/webapp.bicep
-      displayName: 'Run Bicep Build'      
-
-    - task: CopyFiles@2
-      displayName: 'Copy ARM Template (.json) files to staging directory'
-      inputs:
-        contents: |
-          Tailspin.SpaceGame.Bicep/**/*.json
-        targetFolder: '$(Build.StagingDirectory)'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact'
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: dropARM
-      condition: succeededOrFailed()
-
   - job: BuildTerraform
     pool:
       vmImage: 'Ubuntu-16.04'
