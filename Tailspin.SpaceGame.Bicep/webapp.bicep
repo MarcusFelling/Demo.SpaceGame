@@ -9,7 +9,7 @@ resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   location: region
   sku:{
     name: skuName
-    capacity: skuCapacity 
+    capacity: skuCapacity
   }
 }
 

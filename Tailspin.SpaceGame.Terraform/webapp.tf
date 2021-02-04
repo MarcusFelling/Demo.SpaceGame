@@ -28,9 +28,14 @@ variable "region" {
   default = "West US"
 }
 
+variable "appservicePlanTier" {
+  default = "Basic"
+}
+
 variable "appservicePlanSize" {
   default = "B1"
 }
+
 variable "appservicePlanCapacity" {
   default = 1
 }
@@ -46,6 +51,7 @@ resource "azurerm_app_service_plan" "serviceplan" {
   resource_group_name = "${azurerm_resource_group.rg.name}"
   kind                = "App"
   sku {
+    tier = var.appservicePlanTier
     size = var.appservicePlanSize
     capacity = var.appservicePlanCapacity
   }
