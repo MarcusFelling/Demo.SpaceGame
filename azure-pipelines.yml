@@ -335,6 +335,7 @@ stages:
     environment: dev
     variables:
     - group: SpaceGame
+    - group: TerraformBackend
     strategy:
       runOnce:
         deploy:
@@ -352,6 +353,7 @@ stages:
     environment: test
     variables:
     - group: SpaceGame
+    - group: TerraformBackend
     strategy:
       runOnce:
         deploy:
@@ -378,6 +380,7 @@ stages:
     environment: staging
     variables:
     - group: SpaceGame
+    - group: TerraformBackend
     strategy:
       runOnce:
         deploy:
@@ -404,6 +407,7 @@ stages:
     environment: prod
     variables:
     - group: SpaceGame
+    - group: TerraformBackend
     - name:  serviceConnection
       value: SpaceGame-Prod
     strategy:
