@@ -172,6 +172,24 @@ stages:
         artifactName: dropARM
       condition: succeededOrFailed()
 
+  - job: BuildTerraform
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+    - task: CopyFiles@2
+      displayName: 'Copy .tf files to staging directory'
+      inputs:
+        contents: |
+          Tailspin.SpaceGame.Terraform/**/*.tf
+        targetFolder: '$(Build.StagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: dropTerraform
+      condition: succeededOrFailed()
+
 - stage: DBAVerificationScript
   displayName: 'Script database schema changes'
   dependsOn: Build
