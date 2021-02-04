@@ -12,10 +12,16 @@ terraform {
     features {}
 }
 
-locals {
-  appResourceGroup = "__appresourcegroup__"
-  appServicePlanName = "__appserviceplan__-__system.stagename__"
-  appServiceName = "__appservicename__"
+variable "appResourceGroup" {
+  default = "__appresourcegroup__"
+}
+
+variable "appServicePlanName" {
+  default = "__appserviceplan__-__system.stagename__"
+}
+
+variable "appServiceName" {
+  default = "__appservicename__"
 }
 
 variable "region" {
