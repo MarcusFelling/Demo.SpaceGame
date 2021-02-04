@@ -9,43 +9,56 @@ terraform {
 	}
   provider "azurerm" {
     version = "=2.0.0"
+    features {}
 }
 
-locals {
-  appResourceGroup = "__appresourcegroup__"
-  appServicePlanName = "__appserviceplan__-__system.stagename__"
-  appServiceName = "__appservicename__"
+variable "appResourceGroup" {
+  default = "__appresourcegroup__"
+}
+
+variable "appServicePlanName" {
+  default = "__appserviceplan__-__system.stagename__"
+}
+
+variable "appServiceName" {
+  default = "__appservicename__"
 }
 
 variable "region" {
   default = "West US"
 }
 
+variable "appservicePlanTier" {
+  default = "Basic"
+}
+
 variable "appservicePlanSize" {
   default = "B1"
 }
+
 variable "appservicePlanCapacity" {
   default = 1
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = local.appResourceGroup
+  name     = var.appResourceGroup
   location = var.region
 }
 
 resource "azurerm_app_service_plan" "serviceplan" {
-  name                = locals.appServicePlanName
+  name                = var.appServicePlanName
   location            = "${azurerm_resource_group.rg.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   kind                = "App"
   sku {
+    tier = var.appservicePlanTier
     size = var.appservicePlanSize
     capacity = var.appservicePlanCapacity
   }
 }
 
 resource "azurerm_app_service" "appservice" {
-  name                = locals.appServiceName
+  name                = var.appServiceName
   location            = "${azurerm_app_service_plan.serviceplan.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   app_service_plan_id = "${azurerm_app_service_plan.serviceplan.id}"
