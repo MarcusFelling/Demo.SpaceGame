@@ -1,4 +1,3 @@
-
 param skuName string = 'B1'
 param skuCapacity int = 1
 param region string = 'Central US'
