@@ -1,15 +1,15 @@
 terraform {
-  required_version = ">= 0.11" 
-    backend "azurerm" {
-      storage_account_name = "__terraformstorageaccount__"
-      container_name       = "terraform"
-      key                  = "__system.stagename__.terraform.tfstate"
-      access_key  ="__storagekey__"
-    }
-	}
-  provider "azurerm" {
-    version = "=2.0.0"
-    features {}
+  required_version = ">= 0.11"
+  backend "azurerm" {
+    storage_account_name = "__terraformstorageaccount__"
+    container_name       = "terraform"
+    key                  = "__system.stagename__.terraform.tfstate"
+    access_key           = "__storagekey__"
+  }
+}
+provider "azurerm" {
+  version = "=2.0.0"
+  features {}
 }
 
 variable "appResourceGroup" {
@@ -47,19 +47,19 @@ resource "azurerm_resource_group" "rg" {
 
 resource "azurerm_app_service_plan" "serviceplan" {
   name                = var.appServicePlanName
-  location            = "${azurerm_resource_group.rg.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
   kind                = "App"
   sku {
-    tier = var.appservicePlanTier
-    size = var.appservicePlanSize
+    tier     = var.appservicePlanTier
+    size     = var.appservicePlanSize
     capacity = var.appservicePlanCapacity
   }
 }
 
 resource "azurerm_app_service" "appservice" {
   name                = var.appServiceName
-  location            = "${azurerm_app_service_plan.serviceplan.location}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
-  app_service_plan_id = "${azurerm_app_service_plan.serviceplan.id}"
+  location            = azurerm_app_service_plan.serviceplan.location
+  resource_group_name = azurerm_resource_group.rg.name
+  app_service_plan_id = azurerm_app_service_plan.serviceplan.id
 }
