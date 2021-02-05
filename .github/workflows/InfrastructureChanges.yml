@@ -1,5 +1,5 @@
 name: "InfrastructureChanges"
-on: workflow_dispatch
+on: pull_request
 jobs:
   terraform:
     name: "Run Terraform Plan"
