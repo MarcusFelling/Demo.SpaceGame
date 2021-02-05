@@ -1,5 +1,8 @@
 name: "InfrastructureChanges"
 on: pull_request
+defaults:
+  run:
+    working-directory: ./Tailspin.SpaceGame.Terraform
 jobs:
   terraform:
     name: "Run Terraform Plan"
