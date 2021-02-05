@@ -7,11 +7,7 @@ jobs:
   terraform:
     name: "Run Terraform Plan"
     runs-on: ubuntu-latest
-    env:
-      ARM_CLIENT_ID: ${{secrets.TF_ARM_CLIENT_ID}}
-      ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
-      ARM_SUBSCRIPTION_ID: ${{secrets.TF_ARM_SUBSCRIPTION_ID}}
-      ARM_TENANT_ID: ${{secrets.TF_ARM_TENANT_ID}}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -29,10 +25,22 @@ jobs:
         id: init
         run: terraform init
 
-      - name: Terraform Plan
+      - name: "Terraform Plan"
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.12.13
+          tf_actions_subcommand: "plan"
+          tf_actions_working_dir: "./Tailspin.SpaceGame.Terraform"
+          tf_actions_comment: true
+          args: -no-color
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_agent_client_id: ${{ secrets.TF_ARM_CLIENT_ID }}
+          TF_VAR_agent_client_secret: ${{ secrets.TF_ARM_CLIENT_SECRET }}
+          TF_VAR_subscription_id: ${{ secrets.TF_ARM_SUBSCRIPTION_ID }}
+          TF_VAR_tenant_id: ${{ secrets.TF_ARM_TENANT_ID }}
         continue-on-error: true
 
       - uses: actions/github-script@0.9.0
