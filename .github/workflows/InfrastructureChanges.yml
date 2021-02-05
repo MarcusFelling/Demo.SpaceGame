@@ -7,6 +7,11 @@ jobs:
   terraform:
     name: "Run Terraform Plan"
     runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: b0b30e4e-f85f-446a-8ef1-62dc97a29c9d
+      ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
+      ARM_SUBSCRIPTION_ID: 315a2d36-a47c-4d75-be4d-69c2633e7dcf
+      ARM_TENANT_ID: 72f988bf-86f1-41af-91ab-2d7cd011db47    
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -27,7 +32,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
-        run: terraform plan -no-color
+        run: terraform plan -no-color -var-file="spacegame.tfvars"
         continue-on-error: true
 
       - uses: actions/github-script@0.9.0
