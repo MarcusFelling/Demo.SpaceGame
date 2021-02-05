@@ -1,12 +1,14 @@
 terraform {
-  required_version = ">= 0.11"
-  backend "azurerm" {
-    storage_account_name = "__terraformstorageaccount__"
-    container_name       = "terraform"
-    key                  = "__system.stagename__.terraform.tfstate"
-    access_key           = "__storagekey__"
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "MarcusFelling"
+
+    workspaces {
+      name = "DemoSpaceGame"
+    }
   }
 }
+
 provider "azurerm" {
   features {}
 }
