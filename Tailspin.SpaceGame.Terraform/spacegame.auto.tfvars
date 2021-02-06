@@ -4,4 +4,4 @@ appServiceName         = "tailspin-space-game-dev-26178"
 region                 = "West US"
 appservicePlanTier     = "Basic"
 appservicePlanSize     = "B1"
-appservicePlanCapacity = 1
+appservicePlanCapacity = 2
