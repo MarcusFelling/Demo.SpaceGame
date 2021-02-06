@@ -64,10 +64,4 @@ jobs:
             })
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: Terraform Apply
-        id: apply
-        if: github.event_name == 'pull_request'  
-        run: terraform apply -auto-approve
-        continue-on-error: true        
+        run: exit 1 
