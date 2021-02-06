@@ -1,3 +1,4 @@
+# Use TF Cloud for Backend
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
@@ -14,6 +15,7 @@ provider "azurerm" {
   features {}
 }
 
+# Variables
 variable "appResourceGroup" {
   default = "__appresourcegroup__"
 }
@@ -42,11 +44,13 @@ variable "appservicePlanCapacity" {
   default = 1
 }
 
+# Create Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = var.appResourceGroup
   location = var.region
 }
 
+# Create Service Plan
 resource "azurerm_app_service_plan" "serviceplan" {
   name                = var.appServicePlanName
   location            = azurerm_resource_group.rg.location
@@ -59,6 +63,7 @@ resource "azurerm_app_service_plan" "serviceplan" {
   }
 }
 
+# Create App Service
 resource "azurerm_app_service" "appservice" {
   name                = var.appServiceName
   location            = azurerm_app_service_plan.serviceplan.location
