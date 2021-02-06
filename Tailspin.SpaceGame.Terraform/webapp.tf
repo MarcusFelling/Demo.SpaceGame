@@ -11,10 +11,10 @@ variable "tenant_id" {
 terraform {
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
       version = "=2.46.0"
     }
-  }  
+  }
   backend "remote" {
     hostname     = "app.terraform.io"
     organization = "MarcusFelling"
