@@ -7,10 +7,22 @@ jobs:
   terraform:
     name: "Run Terraform Plan"
     runs-on: ubuntu-latest
+    # Add env variables for service principal
+    env:
+      TF_LOG: TRACE
+      ARM_CLIENT_ID: ${{ secrets.TF_ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.TF_ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.TF_ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.TF_ARM_TENANT_ID }}    
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+                  
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
@@ -23,25 +35,10 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-
-      - name: Azure Login
-        uses: Azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Azure Login
-        uses: Azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-                    
+     
       - name: Terraform Plan
         id: plan
-        if: github.event_name == 'pull_request'
-        env:
-          ARM_CLIENT_ID: ${{secrets.TF_ARM_CLIENT_ID}}
-          ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
-          ARM_SUBSCRIPTION_ID: ${{secrets.TF_ARM_SUBSCRIPTION_ID}}
-          ARM_TENANT_ID: ${{secrets.TF_ARM_TENANT_ID}}        
+        if: github.event_name == 'pull_request'  
         run: terraform plan -no-color
         continue-on-error: true
 
