@@ -47,7 +47,7 @@ variable "appservicePlanSize" {
 }
 
 variable "appservicePlanCapacity" {
-  default = 1
+  default = 2
 }
 
 # Create Resource Group
