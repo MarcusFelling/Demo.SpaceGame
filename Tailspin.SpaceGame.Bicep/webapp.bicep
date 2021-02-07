@@ -11,7 +11,7 @@ param dbUserName string
 param dbPassword string {
   secure: true
 }
-var dbURI = '[environment().sqlServerHostname]'
+var dbURI = '[environment().suffixes.sqlServerHostname]'
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName
