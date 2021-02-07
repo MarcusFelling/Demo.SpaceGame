@@ -321,8 +321,6 @@ stages:
   displayName: 'Deploy to the test environment'
   dependsOn:
   - Dev
-  - DBAVerificationScript
-  - DBAVerificationApply
   condition: |
     and
     (
