@@ -383,3 +383,28 @@ stages:
         deploy:
           steps:
           - template: spacegame-bicep-deploy.yml@templates
+
+- stage: 'Cleanup'
+  displayName: 'Cleanup dev environment'
+  dependsOn:
+  - Prod 
+  condition: succeeded('Prod')
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'windows-2019'
+    environment: dev
+    variables:
+    - group: SpaceGame
+    - name: appID
+      value: $(Build.BuildId)    
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: AzureCLI@2
+              displayName: "Delete dev environment"
+              inputs:
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: 'az group delete -n $(appName)-Dev-rg'
