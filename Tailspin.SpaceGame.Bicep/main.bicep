@@ -34,7 +34,7 @@ module webapp './webapp.bicep' = {
   params:{
     skuName: 'B1'
     skuCapacity: 1
-    region: rg.location
+    region: region
     servicePlanName: servicePlanName
     appServiceName: appServiceName 
     sqlServerName: sqlServerName
