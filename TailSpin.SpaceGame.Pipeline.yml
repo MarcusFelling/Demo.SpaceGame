@@ -399,7 +399,7 @@ stages:
     - name: appID
       value: $(Build.BuildId)    
     strategy:
-      runOnce:
+      runOnce: 
         deploy:
           steps:
           - task: AzureCLI@2
