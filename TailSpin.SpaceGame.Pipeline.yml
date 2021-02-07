@@ -175,7 +175,7 @@ stages:
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
   dependsOn:
-  - Build
+  - Build 
   condition: succeeded('Build')
   jobs:
   - deployment: Deploy
