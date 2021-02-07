@@ -1,6 +1,6 @@
 param skuName string = 'B1'
 param skuCapacity int = 1
-param region string = 'westus'
+param region string = 'westus' 
 param servicePlanName string = '__appserviceplan__-__system.stagename__'
 param appServiceName string = '__appservicename__'
 
