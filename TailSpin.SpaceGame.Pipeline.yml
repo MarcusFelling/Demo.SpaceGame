@@ -404,7 +404,7 @@ stages:
           steps:
           - task: AzureCLI@2
             inputs:
-                azureSubscription: $(serviceConnection)'
+                azureSubscription: $(serviceConnection)
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
                 inlineScript: 'az group delete -n $(appName)-Dev-rg'
