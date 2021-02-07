@@ -1,8 +1,8 @@
-param skuName string = 'B1'
-param skuCapacity int = 1
-param region string = 'westus' 
-param servicePlanName string = '__appserviceplan__-__system.stagename__'
-param appServiceName string = '__appservicename__'
+param skuName string
+param skuCapacity int
+param region string
+param servicePlanName string
+param appServiceName string
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName

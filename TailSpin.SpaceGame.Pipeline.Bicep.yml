@@ -149,7 +149,7 @@ stages:
       displayName: 'Install Bicep'
       
     - script: |
-        bicep build Tailspin.SpaceGame.Bicep/webapp.bicep
+        bicep build Tailspin.SpaceGame.Bicep/main.bicep
       displayName: 'Run Bicep Build'      
 
     - task: CopyFiles@2
