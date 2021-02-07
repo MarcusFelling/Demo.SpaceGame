@@ -9,7 +9,7 @@ variables:
   dotnetSdkVersion: '3.1.100'
   region: 'West US' # Region for all resources
   appresourcegroup: $(appName)-$(System.StageName)-rg
-  serviceConnection: SpaceGame-NonProd
+  serviceConnection: SpaceGame-NonProd # Service connection uses service principal, prod requires approval
   appName: 'tailspin-space-game'
   appID: '26178' 
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
@@ -300,14 +300,8 @@ stages:
 - stage: 'Dev'
   displayName: 'Deploy to the dev environment'
   dependsOn:
-  - DBAVerificationScript
-  - DBAVerificationApply
-  condition: |
-    and
-    (
-      succeeded('DBAVerificationScript'),
-      in(dependencies.DBAVerificationApply.result, 'Succeeded', 'Skipped')
-    )
+  - Build
+  condition: succeeded('Build')
   jobs:
   - deployment: Deploy
     pool:
@@ -323,8 +317,17 @@ stages:
 
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
-  dependsOn: Dev
-  condition: and(succeeded('Dev'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  dependsOn:
+  - Dev
+  - DBAVerificationScript
+  - DBAVerificationApply
+  condition: |
+    and
+    (
+      succeeded('DBAVeBuirificationScript'),
+      succeeded('DBAVeBuirificationScript'),
+      in(dependencies.DBAVerificationApply.result, 'Succeeded', 'Skipped')
+    )  
   jobs:
   - deployment: Deploy
     pool:
@@ -346,23 +349,6 @@ stages:
     - group: SpaceGame
     steps:
     - template: functional-tests.yml@templates
-
-- stage: 'Staging'
-  displayName: 'Deploy to the staging environment'
-  dependsOn: Test
-  condition: and(succeeded('Test'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'windows-2019'
-    environment: staging
-    variables:
-    - group: SpaceGame
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: spacegame-bicep-deploy.yml@templates
   - job: RunLoadTests
     dependsOn: Deploy
     displayName: 'Run load tests'
@@ -375,8 +361,8 @@ stages:
 
 - stage: 'Prod'
   displayName: 'Deploy to the Production environment'
-  dependsOn: Staging
-  condition: and(succeeded('Staging'), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+  dependsOn: Test
+  condition: succeeded('Test')
   jobs:
   - deployment: Deploy
     pool:
@@ -390,13 +376,4 @@ stages:
       runOnce:
         deploy:
           steps:
-          - template: spacegame-bicep-deploy.yml@templates           
-  - job: RunUITests
-    dependsOn: Deploy
-    displayName: 'Run UI tests'
-    pool:
-      vmImage: 'vs2017-win2016'
-    variables:
-    - group: SpaceGame
-    steps: 
-    - template: functional-tests.yml@templates
+          - template: spacegame-bicep-deploy.yml@templates

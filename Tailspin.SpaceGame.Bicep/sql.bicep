@@ -78,16 +78,3 @@ resource keys 'Microsoft.Sql/servers/keys@2015-05-01-preview' = {
     serverKeyType: 'ServiceManaged'
   }
 }
-
-resource blob 'Microsoft.Storage/storageAccounts/blobServices@2020-08-01-preview' = {
-  name: '${storageAccount.name}/default'
-}
-
-resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' = {
-  name: '${storageAccount.name}/bacpac'
-  properties: {
-    defaultEncryptionScope: '$account-encryption-key'
-    denyEncryptionScopeOverride: false
-    publicAccess: 'None'
-  }
-}
