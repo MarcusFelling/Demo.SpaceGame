@@ -363,7 +363,7 @@ stages:
     steps: 
     - template: load-tests.yml@templates
 
-- stage: 'Prod'
+- stage: 'Prod' 
   displayName: 'Deploy to the Production environment'
   dependsOn: Test
   condition: succeeded('Test')
