@@ -69,11 +69,3 @@ resource firewallAllowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@20
     endIpAddress: '0.0.0.0'
   }
 }
-
-resource keys 'Microsoft.Sql/servers/keys@2015-05-01-preview' = {
-  name: '${sqlServer.name}/ServiceManaged'
-  kind: 'servicemanaged'
-  properties: {
-    serverKeyType: 'ServiceManaged'
-  }
-}
