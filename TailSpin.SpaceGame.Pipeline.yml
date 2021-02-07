@@ -166,7 +166,7 @@ stages:
         targetFolder: '$(Build.StagingDirectory)'
 
     - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact'
+      displayName: 'Publish Artifact' 
       inputs:
         pathToPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: dropARM
