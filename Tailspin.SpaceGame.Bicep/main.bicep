@@ -19,7 +19,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 // Create SQL
 module sql './sql.bicep' = {
   name: 'sql'
-  scope: resourceGroup('rg')
+  scope: resourceGroup('${resourceGroupName}')
   params:{
     sqlServerName: sqlServerName 
     storageAccountName: storageAccountName
@@ -30,7 +30,7 @@ module sql './sql.bicep' = {
 // Create web app
 module webapp './webapp.bicep' = {
   name: 'webapp'
-  scope: resourceGroup('rg')
+  scope: resourceGroup('${resourceGroupName}')
   params:{
     skuName: 'B1'
     skuCapacity: 1
