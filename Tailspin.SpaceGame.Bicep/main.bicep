@@ -1,23 +1,26 @@
 targetScope = 'subscription' // subscription scope required to create resource
-param region string = 'West US' // region for all resources
+
+// All params are set by pipeline variables through token replacement
+param region string = '__region__'
+param resourceGroupName string = '__appresourcegroup__'
+param servicePlanName string = '__appserviceplan__-__system.stagename__'
+param appServiceName string = '__appservicename__' 
 
 // Create resource group
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: '__appresourcegroup__'
+  name: resourceGroupName
   location: region
 }
-
-var rgScope = resourceGroup('rg') // use the scope of the newly-created resource group for modules below
 
 // Create web app
 module webapp './webapp.bicep' = {
   name: 'webapp'
-  scope: rgScope
+  scope: resourceGroup('rg')
   params:{
     skuName: 'B1'
     skuCapacity: 1
     region: rg.location
-    servicePlanName: '__appserviceplan__-__system.stagename__'
-    appServiceName: '__appservicename__'    
+    servicePlanName: servicePlanName
+    appServiceName: appServiceName 
   }
 }
