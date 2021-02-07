@@ -393,7 +393,7 @@ stages:
   - deployment: Deploy
     pool:
       vmImage: 'windows-2019'
-    environment: dev
+    environment: dev 
     variables:
     - group: SpaceGame
     - name: appID
