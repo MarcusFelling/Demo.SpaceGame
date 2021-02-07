@@ -12,6 +12,8 @@ variables:
   dbresourcegroup: $(appName)-rg
   serviceConnection: SpaceGame-NonProd # Service connection uses service principal, prod requires approval
   appName: 'tailspin-space-game'
+  appservicename: $(appName)-$(System.StageName)-$(appID)
+  appserviceplan: $(appName)-service-plan
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
   storageAccountName: 'spacegamedbstorage2134'
