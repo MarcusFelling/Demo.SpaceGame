@@ -1,10 +1,5 @@
 name: $(Major).$(Minor).$(Patch)
-trigger:
-- master
-pr:
-  branches:
-    include:
-    - master
+trigger: none
      
 variables:
   Major: '1'
