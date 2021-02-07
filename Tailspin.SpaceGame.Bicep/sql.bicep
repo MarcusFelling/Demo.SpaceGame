@@ -53,7 +53,7 @@ resource database 'Microsoft.Sql/servers/databases@2020-08-01-preview' = {
   }
   properties: {
     collation: 'SQL_Latin1_General_CP1_CI_AS'
-    maxSizeBytes: 4000
+    maxSizeBytes: '4294967296'
     catalogCollation: 'SQL_Latin1_General_CP1_CI_AS'
     zoneRedundant: false
     readScale: 'Disabled'
