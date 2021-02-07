@@ -9,10 +9,6 @@ param sqlServerName string = '__sqlServerName__'
 param storageAccountName string = '__storageAccountName__'
 param dbName string = '__dbName__'
 param dbUserName string = '__adminLogin__'
-param dbPassword string {
-  secure: true
-  default: '__adminPassword__' 
-}
 
 // Create resource group
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
@@ -41,9 +37,9 @@ module webapp './webapp.bicep' = {
     region: rg.location
     servicePlanName: servicePlanName
     appServiceName: appServiceName 
-    sqlServerName: sql.name
+    sqlServerName: sqlServerName
     dbName: dbName
     dbUserName: dbUserName
-    dbPassword: dbPassword
+    dbPassword: '__adminPassword__'
   }
 }

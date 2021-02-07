@@ -11,7 +11,7 @@ variables:
   appresourcegroup: $(appName)-$(System.StageName)-rg
   serviceConnection: SpaceGame-NonProd
   appName: 'tailspin-space-game'
-  appID: '26178'
+  appID: '26178' 
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
   storageAccountName: 'spacegamedbstorage2134'

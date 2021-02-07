@@ -22,8 +22,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' =
   properties: {
     networkAcls: {
       bypass: 'AzureServices'
-      virtualNetworkRules: []
-      ipRules: []
       defaultAction: 'Allow'
     }
     supportsHttpsTrafficOnly: true
@@ -62,7 +60,6 @@ resource database 'Microsoft.Sql/servers/databases@2020-08-01-preview' = {
     autoPauseDelay: 60
     storageAccountType: 'GRS'
     minCapacity: 1
-    maintenanceConfigurationId: '/subscriptions/315a2d36-a47c-4d75-be4d-69c2633e7dcf/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default'
   }
 }
 
@@ -84,44 +81,6 @@ resource keys 'Microsoft.Sql/servers/keys@2015-05-01-preview' = {
 
 resource blob 'Microsoft.Storage/storageAccounts/blobServices@2020-08-01-preview' = {
   name: '${storageAccount.name}/default'
-  properties: {
-    cors: {
-      corsRules: []
-    }
-    deleteRetentionPolicy: {
-      enabled: false
-    }
-  }
-}
-
-resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2020-08-01-preview' = {
-  name: '${storageAccount.name}/default'
-  properties: {
-    protocolSettings: {
-      smb: {}
-    }
-    cors: {
-      corsRules: []
-    }
-  }
-}
-
-resource queueService 'Microsoft.Storage/storageAccounts/queueServices@2020-08-01-preview' = {
-  name: '${storageAccount.name}/default'
-  properties: {
-    cors: {
-      corsRules: []
-    }
-  }
-}
-
-resource tableService 'Microsoft.Storage/storageAccounts/tableServices@2020-08-01-preview' = {
-  name: '${storageAccount.name}/default'
-  properties: {
-    cors: {
-      corsRules: []
-    }
-  }
 }
 
 resource blobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2020-08-01-preview' = {
