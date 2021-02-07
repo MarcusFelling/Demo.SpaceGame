@@ -14,6 +14,9 @@ variables:
   appID: '26178'
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
+  storageAccountName: 'spacegamedbstorage2134'
+  sqlServerName: '$(appName)-sql-3145'
+  dbName: 'tailspindatabase'
  
 resources:
   repositories:
