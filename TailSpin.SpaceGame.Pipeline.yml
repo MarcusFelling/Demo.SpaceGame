@@ -9,9 +9,9 @@ variables:
   dotnetSdkVersion: '3.1.100'
   region: 'West US' # Region for all resources
   appresourcegroup: $(appName)-$(System.StageName)-rg
+  dbresourcegroup: $(appName)-rg
   serviceConnection: SpaceGame-NonProd # Service connection uses service principal, prod requires approval
   appName: 'tailspin-space-game'
-  appID: '26178' 
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
   storageAccountName: 'spacegamedbstorage2134'
@@ -170,6 +170,26 @@ stages:
         artifactName: dropARM
       condition: succeededOrFailed()
 
+- stage: 'Dev'
+  displayName: 'Deploy to the dev environment'
+  dependsOn:
+  - Build
+  condition: succeeded('Build')
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'windows-2019'
+    environment: dev
+    variables:
+    - group: SpaceGame
+    - name: appID
+      value: '26178'    
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: spacegame-bicep-deploy.yml@templates
+
 - stage: DBAVerificationScript
   displayName: 'Script database schema changes'
   dependsOn: Build
@@ -297,24 +317,6 @@ stages:
                   Variables = $vars}
                 Update-VSTeamVariableGroup @methodParameters
 
-- stage: 'Dev'
-  displayName: 'Deploy to the dev environment'
-  dependsOn:
-  - Build
-  condition: succeeded('Build')
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'windows-2019'
-    environment: dev
-    variables:
-    - group: SpaceGame
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: spacegame-bicep-deploy.yml@templates
-
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
   dependsOn:
@@ -333,8 +335,10 @@ stages:
     pool:
       vmImage: 'windows-2019'
     environment: test
-    variables:
+    variables:      
     - group: SpaceGame
+    - name: appID
+      value: '26178'  
     strategy:
       runOnce:
         deploy:
@@ -372,6 +376,8 @@ stages:
     - group: SpaceGame
     - name:  serviceConnection
       value: SpaceGame-Prod
+    - name: appID
+      value: '26178' 
     strategy:
       runOnce:
         deploy:
