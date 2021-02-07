@@ -402,9 +402,9 @@ stages:
       runOnce:
         deploy:
           steps:
-            - task: AzureCLI@2
-              displayName: "Delete dev environment"
-              inputs:
+          - task: AzureCLI@2
+            inputs:
+                azureSubscription: $(serviceConnection)'
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
                 inlineScript: 'az group delete -n $(appName)-Dev-rg'
