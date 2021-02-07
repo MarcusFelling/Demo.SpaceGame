@@ -9,7 +9,6 @@ variables:
   dotnetSdkVersion: '3.1.100'
   appresourcegroup: $(appName)-$(System.StageName)-rg
   serviceConnection: SpaceGame-NonProd
-  dbresourcegroup: 'tailspin-space-game-rg'
   appName: 'tailspin-space-game'
   appID: '26178'
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
