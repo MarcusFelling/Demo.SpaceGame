@@ -3,6 +3,7 @@ targetScope = 'subscription' // subscription scope required to create resource
 // All params are set by pipeline variables through token replacement
 param region string = '__region__'
 param resourceGroupName string = '__appresourcegroup__'
+param dbResourceGroupName string = '__dbresourcegroup__'
 param servicePlanName string = '__appserviceplan__-__system.stagename__'
 param appServiceName string = '__appservicename__' 
 param sqlServerName string = '__sqlServerName__'
@@ -19,7 +20,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 // Create SQL
 module sql './sql.bicep' = {
   name: 'sql'
-  scope: resourceGroup('${resourceGroupName}')
+  scope: resourceGroup('${dbResourceGroupName}')
   params:{
     sqlServerName: sqlServerName 
     storageAccountName: storageAccountName
