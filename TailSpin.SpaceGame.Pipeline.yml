@@ -7,7 +7,7 @@ variables:
   Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
   buildConfiguration: 'Release'
   dotnetSdkVersion: '3.1.100'
-  region: 'West US' # Region for all resources
+  region: 'West US'
   appresourcegroup: $(appName)-$(System.StageName)-rg
   dbresourcegroup: $(appName)-rg
   serviceConnection: SpaceGame-NonProd # Service connection uses service principal, prod requires approval
@@ -185,7 +185,7 @@ stages:
     variables:
     - group: SpaceGame
     - name: appID
-      value: '26178'    
+      value: $(Build.BuildId)    
     strategy:
       runOnce:
         deploy:
