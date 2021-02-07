@@ -3,7 +3,7 @@ param region string = 'West US' // region for all resources
 
 // Create resource group
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: 'rg'
+  name: '__appresourcegroup__'
   location: region
 }
 
