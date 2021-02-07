@@ -11,7 +11,7 @@ param dbName string = '__dbName__'
 param dbUserName string = '__adminLogin__'
 param dbPassword string {
   secure: true
-  default: '__adminPassword__'
+  default: '__adminPassword__' 
 }
 
 // Create resource group
