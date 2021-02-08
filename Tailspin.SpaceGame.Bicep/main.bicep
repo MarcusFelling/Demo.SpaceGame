@@ -1,4 +1,4 @@
-targetScope = 'subscription' // subscription scope required to create resource
+targetScope = 'subscription' // subscription scope required to create resource group
 
 // All params are set by pipeline variables through token replacement
 param region string = '__region__'
