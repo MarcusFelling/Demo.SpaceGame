@@ -10,7 +10,7 @@ param sqlServerName string = '__sqlServerName__'
 param storageAccountName string = '__storageAccountName__'
 param dbName string = '__dbName__'
 param dbUserName string = '__adminLogin__'
-param dbPassword string { 
+param dbPassword string {
   secure: true
 }
 
