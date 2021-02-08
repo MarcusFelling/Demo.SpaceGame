@@ -2,7 +2,7 @@ param skuName string
 param skuCapacity int
 param region string
 param servicePlanName string
-param appServiceName string
+param appServiceName string 
 
 // Connection string params
 param sqlServerName string
