@@ -19,7 +19,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: resourceGroupName
   location: region
 }
-
+ 
 // Create SQL
 module sql './sql.bicep' = {
   name: 'sql'
