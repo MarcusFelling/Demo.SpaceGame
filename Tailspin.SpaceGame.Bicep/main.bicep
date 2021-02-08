@@ -10,9 +10,7 @@ param sqlServerName string = '__sqlServerName__'
 param storageAccountName string = '__storageAccountName__'
 param dbName string = '__dbName__'
 param dbUserName string = '__adminLogin__'
-param dbPassword string {
-  secure: true
-}
+param dbPassword string = '__adminPassword__'
 
 // Create resource group
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
