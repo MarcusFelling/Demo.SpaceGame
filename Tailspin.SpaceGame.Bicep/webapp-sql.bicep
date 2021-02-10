@@ -1,3 +1,6 @@
+// All resources
+param region string
+
 // SQL
 param sqlServerName string
 param dbName string
@@ -5,7 +8,7 @@ param storageAccountName string
 
 resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   name: sqlServerName
-  location: 'southcentralus'
+  location: region
   properties: {
     administratorLogin: 'azuresql'
     version: '12.0'
@@ -14,7 +17,7 @@ resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
   name: storageAccountName
-  location: 'centralus'
+  location: region
   sku: {
     name: 'Standard_RAGRS'
     tier: 'Standard'
@@ -45,7 +48,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' =
 
 resource database 'Microsoft.Sql/servers/databases@2020-08-01-preview' = {
   name: '${sqlServer.name}/${dbName}'
-  location: 'southcentralus'
+  location: region
   sku: {
     name: 'GP_S_Gen5'
     tier: 'GeneralPurpose'
@@ -72,7 +75,6 @@ resource firewallAllowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@20
 }
 
 // Web App
-param region string
 param servicePlanName string
 param appServiceName string 
 
