@@ -25,7 +25,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
   name: appServiceName
   location: region
   properties: {
-    serverFarmId: servicePlan.id
+    serverFarmId: '${servicePlan.id}'
     siteConfig: {
       connectionStrings:[
         {
