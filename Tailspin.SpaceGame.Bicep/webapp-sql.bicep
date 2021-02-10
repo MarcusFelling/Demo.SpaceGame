@@ -82,9 +82,6 @@ param appServiceName string
 param dbUserName string
 param dbPassword string 
 
-// Get sql URI dynamically to avoid hardcoding
-var dbURI = environment().suffixes.sqlServerHostname
-
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName
   location: region
@@ -103,7 +100,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
       connectionStrings:[
         {
           type:'SQLAzure'
-          connectionString: 'DefaultConnection=Server=tcp:${sqlServerName}${dbURI},1433;Initial Catalog=${dbName};Persist Security Info=False;User ID=${dbUserName};Password=${dbPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          connectionString: 'DefaultConnection=Server=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${dbName};Persist Security Info=False;User ID=${dbUserName};Password=${dbPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
         }
       ]
     }

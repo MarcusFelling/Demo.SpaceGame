@@ -7,12 +7,11 @@ resource spacegameRg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '__resourcegroup__'
   location: '__region__'
 }
-var rgScope = resourceGroup('__resourcegroup__') // use the scope of the newly-created resource group
 
 // Create web app and sql
 module spacegame './webapp-sql.bicep' = {
   name: 'spacegame'
-  scope: rgScope
+  scope: resourceGroup('__resourcegroup__')
   params:{
     region: '__region__'
     servicePlanName: '__appserviceplan__-__system.stagename__'
