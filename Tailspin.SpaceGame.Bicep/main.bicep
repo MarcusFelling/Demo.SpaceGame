@@ -1,45 +1,35 @@
-targetScope = 'subscription' // subscription scope required to create resource group
-
+// Creates all infrastructure for Space Game
 // All params are set by pipeline variables through token replacement
-// Prefix with spaceGame to ensure params are unique to module params
-param spaceGameRegion string = '__region__'
-param spaceGameResourceGroupName string = '__appresourcegroup__'
-param spaceGameDbResourceGroupName string = '__dbresourcegroup__'
-param spaceGameServicePlanName string = '__appserviceplan__-__system.stagename__'
-param spaceGameAppServiceName string = '__appservicename__' 
-param spaceGameSqlServerName string = '__sqlServerName__'
-param spaceGameStorageAccountName string = '__storageAccountName__'
-param spaceGameDbName string = '__dbName__'
-param spaceGameDbUserName string = '__adminLogin__'
+targetScope = 'subscription' // subscription scope required to create resource group
 
 // Create resource group
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: spaceGameResourceGroupName
-  location: spaceGameRegion
+  name: '__appresourcegroup__'
+  location: '__region__'
 }
  
 // Create SQL
 module sql './sql.bicep' = {
   name: 'sql'
-  scope: resourceGroup('${spaceGameDbResourceGroupName}')
+  scope: resourceGroup('${'__dbresourcegroup__'}')
   params:{
-    sqlServerName: spaceGameSqlServerName 
-    storageAccountName: spaceGameStorageAccountName
-    dbName: spaceGameDbName
+    sqlServerName: '__sqlServerName__' 
+    storageAccountName: '__storageAccountName__'
+    dbName: '__storageAccountName__'
   }
 }
 
 // Create web app
 module webapp './webapp.bicep' = {
   name: 'webapp'
-  scope: resourceGroup('${spaceGameResourceGroupName}')
+  scope: resourceGroup('${'__appresourcegroup__'}')
   params:{
-    region: spaceGameRegion
-    servicePlanName: spaceGameServicePlanName
-    appServiceName: spaceGameAppServiceName 
-    sqlServerName: spaceGameSqlServerName
-    dbName: spaceGameDbName
-    dbUserName: spaceGameDbUserName
+    region: '__region__'
+    servicePlanName: '__appserviceplan__-__system.stagename__'
+    appServiceName: '__appservicename__'  
+    sqlServerName: '__sqlServerName__'
+    dbName: '__storageAccountName__'
+    dbUserName: '__adminLogin__'
     dbPassword: '__adminPassword__'
   }
 }
