@@ -3,10 +3,12 @@ param region string
 
 // SQL
 param sqlServerName string
+param storageAccountName string
 param dbName string
 param dbUserName string
-param dbPassword string 
-param storageAccountName string
+param dbPassword string {
+  secure: true
+}
 
 resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   name: sqlServerName
