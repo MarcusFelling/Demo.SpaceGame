@@ -4,13 +4,16 @@ param region string
 // SQL
 param sqlServerName string
 param dbName string
+param dbUserName string
+param dbPassword string 
 param storageAccountName string
 
 resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   name: sqlServerName
   location: region
   properties: {
-    administratorLogin: 'azuresql'
+    administratorLogin: dbUserName
+    administratorLoginPassword: dbPassword
     version: '12.0'
   }
 }
@@ -77,10 +80,6 @@ resource firewallAllowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@20
 // Web App
 param servicePlanName string
 param appServiceName string 
-
-// Connection string params
-param dbUserName string
-param dbPassword string 
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName
