@@ -1,5 +1,3 @@
-param skuName string
-param skuCapacity int
 param region string
 param servicePlanName string
 param appServiceName string 
@@ -15,8 +13,8 @@ resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName
   location: region
   sku:{
-    name: skuName
-    capacity: skuCapacity
+    name: 'B1'
+    capacity: 1
   }
 }
 

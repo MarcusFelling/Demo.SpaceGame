@@ -34,8 +34,6 @@ module webapp './webapp.bicep' = {
   name: 'webapp'
   scope: resourceGroup('${resourceGroupName}')
   params:{
-    skuName: 'B1'
-    skuCapacity: 1
     region: region
     servicePlanName: servicePlanName
     appServiceName: appServiceName 
