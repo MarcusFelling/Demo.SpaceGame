@@ -11,7 +11,7 @@ resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 // Create web app and sql
 module spacegame './webapp-sql.bicep' = {
   name: 'spacegame'
-  scope: resourceGroup('${'__dbresourcegroup__'}')
+  scope: resourceGroup('${'__appresourcegroup__'}')
   params:{
     region: '__region__'
     servicePlanName: '__appserviceplan__-__system.stagename__'
