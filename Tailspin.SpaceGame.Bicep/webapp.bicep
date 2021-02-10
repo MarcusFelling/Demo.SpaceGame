@@ -9,6 +9,7 @@ param dbName string
 param dbUserName string
 param dbPassword string
 
+// Get sql URI dynamically to avoid hardcoding
 var dbURI = environment().suffixes.sqlServerHostname
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
