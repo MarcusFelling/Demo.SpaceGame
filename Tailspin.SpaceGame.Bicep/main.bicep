@@ -1,4 +1,4 @@
-// Creates all infrastructure for Space Game
+// Creates all infrastructure for Space Game 
 // All params are set by pipeline variables through token replacement
 targetScope = 'subscription' // subscription scope required to create resource group
 
