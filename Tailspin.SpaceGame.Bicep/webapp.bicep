@@ -7,9 +7,7 @@ param appServiceName string
 param sqlServerName string
 param dbName string
 param dbUserName string
-param dbPassword string {
-  secure: true
-}
+param dbPassword string
 
 var dbURI = environment().suffixes.sqlServerHostname
 
