@@ -1,45 +1,45 @@
 targetScope = 'subscription' // subscription scope required to create resource group
 
 // All params are set by pipeline variables through token replacement
-param region string = '__region__'
-param resourceGroupName string = '__appresourcegroup__'
-param dbResourceGroupName string = '__dbresourcegroup__'
-param servicePlanName string = '__appserviceplan__-__system.stagename__'
-param appServiceName string = '__appservicename__' 
-param sqlServerName string = '__sqlServerName__'
-param storageAccountName string = '__storageAccountName__'
-param dbName string = '__dbName__'
-param dbUserName string = '__adminLogin__'
-param dbPassword string = '__adminPassword__'
+// Prefix with spaceGame to ensure params are unique to module params
+param spaceGameRegion string = '__region__'
+param spaceGameResourceGroupName string = '__appresourcegroup__'
+param spaceGameDbResourceGroupName string = '__dbresourcegroup__'
+param spaceGameServicePlanName string = '__appserviceplan__-__system.stagename__'
+param spaceGameAppServiceName string = '__appservicename__' 
+param spaceGameSqlServerName string = '__sqlServerName__'
+param spaceGameStorageAccountName string = '__storageAccountName__'
+param spaceGameDbName string = '__dbName__'
+param spaceGameDbUserName string = '__adminLogin__'
 
 // Create resource group
 resource rg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: resourceGroupName
-  location: region
+  name: spaceGameResourceGroupName
+  location: spaceGameRegion
 }
  
 // Create SQL
 module sql './sql.bicep' = {
   name: 'sql'
-  scope: resourceGroup('${dbResourceGroupName}')
+  scope: resourceGroup('${spaceGameDbResourceGroupName}')
   params:{
-    sqlServerName: sqlServerName 
-    storageAccountName: storageAccountName
-    dbName: dbName
+    sqlServerName: spaceGameSqlServerName 
+    storageAccountName: spaceGameStorageAccountName
+    dbName: spaceGameDbName
   }
 }
 
 // Create web app
 module webapp './webapp.bicep' = {
   name: 'webapp'
-  scope: resourceGroup('${resourceGroupName}')
+  scope: resourceGroup('${spaceGameResourceGroupName}')
   params:{
-    region: region
-    servicePlanName: servicePlanName
-    appServiceName: appServiceName 
-    sqlServerName: sqlServerName
-    dbName: dbName
-    dbUserName: dbUserName
-    dbPassword: dbPassword
+    region: spaceGameRegion
+    servicePlanName: spaceGameServicePlanName
+    appServiceName: spaceGameAppServiceName 
+    sqlServerName: spaceGameSqlServerName
+    dbName: spaceGameDbName
+    dbUserName: spaceGameDbUserName
+    dbPassword: '__adminPassword__'
   }
 }

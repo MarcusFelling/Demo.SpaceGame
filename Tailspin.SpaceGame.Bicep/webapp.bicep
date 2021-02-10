@@ -1,3 +1,4 @@
+// Web App params
 param region string
 param servicePlanName string
 param appServiceName string 
@@ -6,7 +7,10 @@ param appServiceName string
 param sqlServerName string
 param dbName string
 param dbUserName string
-param dbPassword string
+param dbPassword string {
+  secure: true
+}
+
 var dbURI = environment().suffixes.sqlServerHostname
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
