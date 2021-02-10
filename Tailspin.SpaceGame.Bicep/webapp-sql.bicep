@@ -97,13 +97,5 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
   location: region
   properties: {
     serverFarmId: '${servicePlan.id}'
-    siteConfig: {
-      connectionStrings:[
-        {
-          type:'SQLAzure'
-          connectionString: 'DefaultConnection=Server=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${dbName};Persist Security Info=False;User ID=${dbUserName};Password=${dbPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-        }
-      ]
-    }
   }
 }
