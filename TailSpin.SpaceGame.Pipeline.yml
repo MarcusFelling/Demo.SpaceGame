@@ -7,9 +7,8 @@ variables:
   Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
   buildConfiguration: 'Release'
   dotnetSdkVersion: '3.1.100'
-  region: 'West US'
-  appresourcegroup: $(appName)-$(System.StageName)-rg
-  dbresourcegroup: $(appName)-rg
+  region: 'West US' # Region for all resources
+  resourcegroup: $(appName)-$(System.StageName)-rg
   serviceConnection: SpaceGame-NonProd # Service connection uses service principal, prod requires approval
   appName: 'tailspin-space-game'
   appservicename: $(appName)-$(System.StageName)-$(appID)
