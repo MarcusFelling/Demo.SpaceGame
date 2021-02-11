@@ -194,7 +194,7 @@ stages:
           steps:
           - template: spacegame-bicep-deploy.yml@templates
 
-  - job: DBSchema
+  - job: DBSchemaApproval
     condition: eq(variables['schemaChanged'], True)
     pool: server
     variables:
@@ -204,6 +204,18 @@ stages:
       inputs:
         notifyUsers: 'mafellin@microsoft.com'
         instructions: 'DBA approval required for schema change'
+    
+  - deployment: DeployDBSchema
+    condition: and(succeeded('DBSchemaApproval'), eq(variables['schemaChanged'], True))  
+    pool:
+      vmImage: 'windows-2019'
+    environment: dev
+    variables:
+    - group: SpaceGame
+    strategy:
+      runOnce:
+        deploy:
+          steps:    
     - download: current
       artifact: dropDacpac            
     - task: SqlAzureDacpacDeployment@1
