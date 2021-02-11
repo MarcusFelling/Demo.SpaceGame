@@ -197,8 +197,6 @@ stages:
   - job: DBSchemaApproval
     condition: eq(variables['schemaChanged'], True)
     pool: server
-    variables:
-    - group: SpaceGame   
     steps:
     - task: ManualValidation@0
       inputs:
@@ -216,43 +214,43 @@ stages:
       runOnce:
         deploy:
           steps:    
-    - download: current
-      artifact: dropDacpac            
-    - task: SqlAzureDacpacDeployment@1
-      displayName: 'Deploy SQL schema'
-      inputs:
-        azureSubscription: '$(serviceConnection)'
-        authenticationType: 'server'
-        serverName: '$(sqlServerName).database.windows.net'
-        databaseName: '$(databasename)'
-        sqlUsername: '$(adminlogin)'
-        sqlPassword: '$(adminPassword)'
-        deployType: 'DacpacTask'
-        deploymentAction: 'Publish'
-        dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
-        ipDetectionMethod: 'AutoDetect'
-    - task: PowerShell@2
-      displayName: 'Remove "schemaChanged" pipeline variable'
-      inputs:
-        targetType: 'inline'
-        script: | 
-          Install-Module VSTeam -Scope CurrentUser -Force
-          Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
-          $methodParameters = @{
-            ProjectName = "$(System.TeamProject)"
-            Name = "SpaceGame"}
-          $vg = Get-VSTeamVariableGroup  @methodParameters 
-          $vars = @{}
-          $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
-          $vars.Remove("schemaChanged")
-          $methodParameters = @{
-            id = $vg.id
-            ProjectName = "$(System.TeamProject)"
-            Name = "SpaceGame"
-            Description = ""
-            Type = "Vsts"
-            Variables = $vars}
-          Update-VSTeamVariableGroup @methodParameters
+          - download: current
+            artifact: dropDacpac            
+          - task: SqlAzureDacpacDeployment@1
+            displayName: 'Deploy SQL schema'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              authenticationType: 'server'
+              serverName: '$(sqlServerName).database.windows.net'
+              databaseName: '$(databasename)'
+              sqlUsername: '$(adminlogin)'
+              sqlPassword: '$(adminPassword)'
+              deployType: 'DacpacTask'
+              deploymentAction: 'Publish'
+              dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
+              ipDetectionMethod: 'AutoDetect'
+          - task: PowerShell@2
+            displayName: 'Remove "schemaChanged" pipeline variable'
+            inputs:
+              targetType: 'inline'
+              script: | 
+                Install-Module VSTeam -Scope CurrentUser -Force
+                Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
+                $methodParameters = @{
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "SpaceGame"}
+                $vg = Get-VSTeamVariableGroup  @methodParameters 
+                $vars = @{}
+                $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
+                $vars.Remove("schemaChanged")
+                $methodParameters = @{
+                  id = $vg.id
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "SpaceGame"
+                  Description = ""
+                  Type = "Vsts"
+                  Variables = $vars}
+                Update-VSTeamVariableGroup @methodParameters
 
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
@@ -279,54 +277,64 @@ stages:
         deploy:
           steps:
           - template: spacegame-bicep-deploy.yml@templates
-  
-  - job: DBSchema
+
+  - job: DBSchemaApproval
     condition: eq(variables['schemaChanged'], True)
     pool: server
-    variables:
-    - group: SpaceGame   
     steps:
     - task: ManualValidation@0
       inputs:
         notifyUsers: 'mafellin@microsoft.com'
         instructions: 'DBA approval required for schema change'
-    - download: current
-      artifact: dropDacpac            
-    - task: SqlAzureDacpacDeployment@1
-      displayName: 'Deploy SQL schema'
-      inputs:
-        azureSubscription: '$(serviceConnection)'
-        authenticationType: 'server'
-        serverName: '$(sqlServerName).database.windows.net'
-        databaseName: '$(databasename)'
-        sqlUsername: '$(adminlogin)'
-        sqlPassword: '$(adminPassword)'
-        deployType: 'DacpacTask'
-        deploymentAction: 'Publish'
-        dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
-        ipDetectionMethod: 'AutoDetect'
-    - task: PowerShell@2
-      displayName: 'Remove "schemaChanged" pipeline variable'
-      inputs:
-        targetType: 'inline'
-        script: | 
-          Install-Module VSTeam -Scope CurrentUser -Force
-          Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
-          $methodParameters = @{
-            ProjectName = "$(System.TeamProject)"
-            Name = "SpaceGame"}
-          $vg = Get-VSTeamVariableGroup  @methodParameters 
-          $vars = @{}
-          $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
-          $vars.Remove("schemaChanged")
-          $methodParameters = @{
-            id = $vg.id
-            ProjectName = "$(System.TeamProject)"
-            Name = "SpaceGame"
-            Description = ""
-            Type = "Vsts"
-            Variables = $vars}
-          Update-VSTeamVariableGroup @methodParameters
+    
+  - deployment: DeployDBSchema
+    condition: and(succeeded('DBSchemaApproval'), eq(variables['schemaChanged'], True))  
+    pool:
+      vmImage: 'windows-2019'
+    environment: dev
+    variables:
+    - group: SpaceGame
+    strategy:
+      runOnce:
+        deploy:
+          steps:    
+          - download: current
+            artifact: dropDacpac            
+          - task: SqlAzureDacpacDeployment@1
+            displayName: 'Deploy SQL schema'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              authenticationType: 'server'
+              serverName: '$(sqlServerName).database.windows.net'
+              databaseName: '$(databasename)'
+              sqlUsername: '$(adminlogin)'
+              sqlPassword: '$(adminPassword)'
+              deployType: 'DacpacTask'
+              deploymentAction: 'Publish'
+              dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
+              ipDetectionMethod: 'AutoDetect'
+          - task: PowerShell@2
+            displayName: 'Remove "schemaChanged" pipeline variable'
+            inputs:
+              targetType: 'inline'
+              script: | 
+                Install-Module VSTeam -Scope CurrentUser -Force
+                Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
+                $methodParameters = @{
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "SpaceGame"}
+                $vg = Get-VSTeamVariableGroup  @methodParameters 
+                $vars = @{}
+                $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
+                $vars.Remove("schemaChanged")
+                $methodParameters = @{
+                  id = $vg.id
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "SpaceGame"
+                  Description = ""
+                  Type = "Vsts"
+                  Variables = $vars}
+                Update-VSTeamVariableGroup @methodParameters
 
   - job: RunUITests
     dependsOn: Deploy
@@ -368,53 +376,64 @@ stages:
         deploy:
           steps:
           - template: spacegame-bicep-deploy.yml@templates
-  - job: DBSchema
+
+  - job: DBSchemaApproval
     condition: eq(variables['schemaChanged'], True)
     pool: server
-    variables:
-    - group: SpaceGame   
     steps:
     - task: ManualValidation@0
       inputs:
         notifyUsers: 'mafellin@microsoft.com'
         instructions: 'DBA approval required for schema change'
-    - download: current
-      artifact: dropDacpac            
-    - task: SqlAzureDacpacDeployment@1
-      displayName: 'Deploy SQL schema'
-      inputs:
-        azureSubscription: '$(serviceConnection)'
-        authenticationType: 'server'
-        serverName: '$(sqlServerName).database.windows.net'
-        databaseName: '$(databasename)'
-        sqlUsername: '$(adminlogin)'
-        sqlPassword: '$(adminPassword)'
-        deployType: 'DacpacTask'
-        deploymentAction: 'Publish'
-        dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
-        ipDetectionMethod: 'AutoDetect'
-    - task: PowerShell@2
-      displayName: 'Remove "schemaChanged" pipeline variable'
-      inputs:
-        targetType: 'inline'
-        script: | 
-          Install-Module VSTeam -Scope CurrentUser -Force
-          Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
-          $methodParameters = @{
-            ProjectName = "$(System.TeamProject)"
-            Name = "SpaceGame"}
-          $vg = Get-VSTeamVariableGroup  @methodParameters 
-          $vars = @{}
-          $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
-          $vars.Remove("schemaChanged")
-          $methodParameters = @{
-            id = $vg.id
-            ProjectName = "$(System.TeamProject)"
-            Name = "SpaceGame"
-            Description = ""
-            Type = "Vsts"
-            Variables = $vars}
-          Update-VSTeamVariableGroup @methodParameters
+    
+  - deployment: DeployDBSchema
+    condition: and(succeeded('DBSchemaApproval'), eq(variables['schemaChanged'], True))  
+    pool:
+      vmImage: 'windows-2019'
+    environment: dev
+    variables:
+    - group: SpaceGame
+    strategy:
+      runOnce:
+        deploy:
+          steps:    
+          - download: current
+            artifact: dropDacpac            
+          - task: SqlAzureDacpacDeployment@1
+            displayName: 'Deploy SQL schema'
+            inputs:
+              azureSubscription: '$(serviceConnection)'
+              authenticationType: 'server'
+              serverName: '$(sqlServerName).database.windows.net'
+              databaseName: '$(databasename)'
+              sqlUsername: '$(adminlogin)'
+              sqlPassword: '$(adminPassword)'
+              deployType: 'DacpacTask'
+              deploymentAction: 'Publish'
+              dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
+              ipDetectionMethod: 'AutoDetect'
+          - task: PowerShell@2
+            displayName: 'Remove "schemaChanged" pipeline variable'
+            inputs:
+              targetType: 'inline'
+              script: | 
+                Install-Module VSTeam -Scope CurrentUser -Force
+                Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
+                $methodParameters = @{
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "SpaceGame"}
+                $vg = Get-VSTeamVariableGroup  @methodParameters 
+                $vars = @{}
+                $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
+                $vars.Remove("schemaChanged")
+                $methodParameters = @{
+                  id = $vg.id
+                  ProjectName = "$(System.TeamProject)"
+                  Name = "SpaceGame"
+                  Description = ""
+                  Type = "Vsts"
+                  Variables = $vars}
+                Update-VSTeamVariableGroup @methodParameters
 
 - stage: 'Cleanup'
   displayName: 'Cleanup dev environment'
