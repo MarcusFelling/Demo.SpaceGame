@@ -443,9 +443,7 @@ stages:
 
 - stage: 'Cleanup'
   displayName: 'Cleanup dev environment'
-  dependsOn:
-  - Prod 
-  condition: succeeded('Prod')
+  condition: or(failed(), succeeded('Prod'))
   jobs:
   - deployment: Deploy
     pool:
