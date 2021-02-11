@@ -206,7 +206,7 @@ stages:
         instructions: 'DBA approval required for schema change'
     
   - deployment: DeployDBSchema
-    condition: and(succeeded('DBSchemaApproval'), eq(variables['schemaChanged'], True))  
+    condition: succeeded('DBSchemaApproval')
     pool:
       vmImage: 'windows-2019'
     environment: dev
