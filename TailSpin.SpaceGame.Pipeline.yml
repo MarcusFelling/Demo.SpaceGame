@@ -213,7 +213,7 @@ stages:
             inputs:
               azureSubscription: '$(serviceConnection)'
               authenticationType: 'server'
-              serverName: '$(servername).database.windows.net'
+              serverName: '$(sqlServerName).database.windows.net'
               databaseName: '$(databasename)'
               sqlUsername: '$(adminlogin)'
               sqlPassword: '$(adminPassword)'
@@ -287,7 +287,7 @@ stages:
             inputs:
               azureSubscription: '$(serviceConnection)'
               authenticationType: 'server'
-              serverName: '$(servername).database.windows.net'
+              serverName: '$(sqlServerName).database.windows.net'
               databaseName: '$(databasename)'
               sqlUsername: '$(adminlogin)'
               sqlPassword: '$(adminPassword)'
