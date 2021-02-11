@@ -99,3 +99,13 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
     serverFarmId: '${servicePlan.id}'
   }
 }
+
+resource connectionString 'Microsoft.Web/sites/config@2020-06-01' = {
+  name: '${appService.name}/connectionstrings'
+  properties: {
+    DefaultConnection: {
+      value: 'Data Source=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${database};User Id=${dbUserName}@${sqlServer.properties.fullyQualifiedDomainName};Password=${dbPassword};'
+      type: 'SQLAzure'
+    }
+  }
+}
