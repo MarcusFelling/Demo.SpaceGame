@@ -197,6 +197,8 @@ stages:
   - job: DBSchemaApproval
     condition: eq(variables['schemaChanged'], True)
     pool: server
+    variables:
+    - group: SpaceGame    
     steps:
     - task: ManualValidation@0
       inputs:
@@ -281,6 +283,8 @@ stages:
   - job: DBSchemaApproval
     condition: eq(variables['schemaChanged'], True)
     pool: server
+    variables:
+    - group: SpaceGame     
     steps:
     - task: ManualValidation@0
       inputs:
@@ -380,6 +384,8 @@ stages:
   - job: DBSchemaApproval
     condition: eq(variables['schemaChanged'], True)
     pool: server
+    variables:
+    - group: SpaceGame     
     steps:
     - task: ManualValidation@0
       inputs:
