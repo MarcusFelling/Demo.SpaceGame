@@ -195,10 +195,11 @@ stages:
           - template: spacegame-bicep-deploy.yml@templates
 
   - job: DBSchemaApproval
+    dependsOn: Deploy
     condition: eq(variables['schemaChanged'], True)
     pool: server
     variables:
-    - group: SpaceGame    
+    - group: SpaceGame     
     steps:
     - task: ManualValidation@0
       inputs:
@@ -206,6 +207,7 @@ stages:
         instructions: 'DBA approval required for schema change'
     
   - deployment: DeployDBSchema
+    dependsOn: DBSchemaApproval
     condition: succeeded('DBSchemaApproval')
     pool:
       vmImage: 'windows-2019'
@@ -224,7 +226,7 @@ stages:
               azureSubscription: '$(serviceConnection)'
               authenticationType: 'server'
               serverName: '$(sqlServerName).database.windows.net'
-              databaseName: '$(dbname)'
+              databaseName: '$(databasename)'
               sqlUsername: '$(adminlogin)'
               sqlPassword: '$(adminPassword)'
               deployType: 'DacpacTask'
@@ -253,7 +255,7 @@ stages:
                   Type = "Vsts"
                   Variables = $vars}
                 Update-VSTeamVariableGroup @methodParameters
-
+                
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
   dependsOn:
@@ -281,6 +283,7 @@ stages:
           - template: spacegame-bicep-deploy.yml@templates
 
   - job: DBSchemaApproval
+    dependsOn: Deploy
     condition: eq(variables['schemaChanged'], True)
     pool: server
     variables:
@@ -292,10 +295,11 @@ stages:
         instructions: 'DBA approval required for schema change'
     
   - deployment: DeployDBSchema
+    dependsOn: DBSchemaApproval
     condition: succeeded('DBSchemaApproval')
     pool:
       vmImage: 'windows-2019'
-    environment: dev
+    environment: test
     variables:
     - group: SpaceGame
     strategy:
@@ -310,7 +314,7 @@ stages:
               azureSubscription: '$(serviceConnection)'
               authenticationType: 'server'
               serverName: '$(sqlServerName).database.windows.net'
-              databaseName: '$(dbname)'
+              databaseName: '$(databasename)'
               sqlUsername: '$(adminlogin)'
               sqlPassword: '$(adminPassword)'
               deployType: 'DacpacTask'
@@ -382,6 +386,7 @@ stages:
           - template: spacegame-bicep-deploy.yml@templates
 
   - job: DBSchemaApproval
+    dependsOn: Deploy
     condition: eq(variables['schemaChanged'], True)
     pool: server
     variables:
@@ -393,10 +398,11 @@ stages:
         instructions: 'DBA approval required for schema change'
     
   - deployment: DeployDBSchema
+    dependsOn: DBSchemaApproval
     condition: succeeded('DBSchemaApproval')
     pool:
       vmImage: 'windows-2019'
-    environment: dev
+    environment: prod
     variables:
     - group: SpaceGame
     strategy:
