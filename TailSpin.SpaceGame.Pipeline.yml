@@ -142,7 +142,7 @@ stages:
 
   - job: BuildBicep
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'ubuntu-20.04'
     steps:
     - script: |
         # Fetch the latest Bicep CLI binary
@@ -267,7 +267,7 @@ stages:
         in(dependencies.DeployDBSchema.result, 'Succeeded', 'Skipped')
       )    
     pool: 
-      vmImage: 'ubuntu-latest'
+      vmImage: 'ubuntu-20.04'
     variables:
     - group: SpaceGame     
     steps:
@@ -373,7 +373,7 @@ stages:
     dependsOn: Deploy
     displayName: 'Run load tests'
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'ubuntu-20.04'
     variables:
       jmeterVersion: '5.2'
     steps: 
