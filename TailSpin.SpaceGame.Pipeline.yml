@@ -260,13 +260,6 @@ stages:
   displayName: 'Deploy to the test environment'
   dependsOn:
   - Dev
-  condition: |
-    and
-    (
-      succeeded('DBAVeBuirificationScript'),
-      succeeded('DBAVeBuirificationScript'),
-      in(dependencies.DBAVerificationApply.result, 'Succeeded', 'Skipped')
-    )  
   jobs:
   - deployment: Deploy
     pool:
