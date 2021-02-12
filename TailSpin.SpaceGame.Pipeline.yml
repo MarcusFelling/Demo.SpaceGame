@@ -267,7 +267,7 @@ stages:
         in(dependencies.DeployDBSchema.result, 'Succeeded', 'Skipped')
       )    
     pool: 
-      vmImage: ubuntu-latest
+      vmImage: 'ubuntu-latest'
     variables:
     - group: SpaceGame     
     steps:
