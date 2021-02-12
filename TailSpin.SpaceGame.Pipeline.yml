@@ -17,11 +17,11 @@ variables:
   environmentNameLower: ${{ lower(variables['System.StageName'] ) }}
   buildConfiguration: 'Release'
   dotnetSdkVersion: '3.1.100'
-  resourcegroup: $(appName)-$(System.StageName)-rg
-  appservicename: $(appName)-$(System.StageName)-$(appID)
-  appserviceplan: $(appName)-service-plan
-  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
-  sqlServerName: '$(appName)-$(System.StageName)-sql'
+  resourceGroup: $(appName)-$(environmentNameLower)-rg
+  appServiceName: $(appName)-$(environmentNameLower)-$(appID)
+  appServicePlanName: $(appName)-$(environmentNameLower)-service-plan
+  sqlServerName: '$(appName)-$(environmentNameLower)-sql'
+  SITE_URL: 'https://$(appName)-$(environmentNameLower)-$(appID).azurewebsites.net'  
  
 resources:
   repositories:

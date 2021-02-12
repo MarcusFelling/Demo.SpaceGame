@@ -4,18 +4,18 @@ targetScope = 'subscription' // subscription scope required to create resource g
 
 // Create resource group
 resource spacegameRg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: '__resourcegroup__'
+  name: '__resourceGroup__'
   location: '__region__'
 }
 
 // Create web app and sql
 module spacegame './webapp-sql.bicep' = {
   name: 'spacegame'
-  scope: resourceGroup('__resourcegroup__')
+  scope: resourceGroup('__resourceGroup__')
   params:{
     region: '__region__'
-    servicePlanName: '__appserviceplan__-__system.stagename__'
-    appServiceName: '__appservicename__'  
+    servicePlanName: '__appServicePlanName__'
+    appServiceName: '__appServiceName__'  
     dbUserName: '__adminLogin__'
     dbPassword: '__adminPassword__'    
     sqlServerName: '__sqlServerName__' 
