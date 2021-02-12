@@ -270,7 +270,9 @@ stages:
     pool: 
       vmImage: 'ubuntu-20.04'
     variables:
-    - group: SpaceGame     
+    - group: SpaceGame  
+    - name: appID
+      value: $(Build.BuildId)
     steps:
     - task: GitHubComment@0
       displayName: 'Add PR comment with site url'  
