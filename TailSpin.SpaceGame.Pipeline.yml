@@ -383,6 +383,7 @@ stages:
 
   - job: RunLoadTests
     dependsOn: 
+    - RunUITests
     - Deploy
     - DeployDBSchema
     displayName: 'Run load tests'
