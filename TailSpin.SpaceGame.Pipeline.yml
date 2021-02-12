@@ -498,4 +498,4 @@ stages:
                 azureSubscription: $(serviceConnection)
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
-                inlineScript: 'az appservice ase delete -n $(appName)-Dev-$(appID) --yes'
+                inlineScript: 'az webapp delete --name $(appName)-Dev-$(appID) --yes'
