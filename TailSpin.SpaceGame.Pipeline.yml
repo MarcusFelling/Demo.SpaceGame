@@ -207,8 +207,15 @@ stages:
         instructions: 'DBA approval required for schema change'
     
   - deployment: DeployDBSchema
-    dependsOn: DBSchemaApproval
-    condition: succeeded('DBSchemaApproval')
+    dependsOn: 
+    - Deploy
+    - DBSchemaApproval
+    condition: |
+      and
+      (
+        succeeded('Deploy'),
+        in(dependencies.DBSchemaApproval.result, 'Succeeded', 'Skipped')
+      )     
     pool:
       vmImage: 'windows-2019'
     environment: dev
@@ -258,14 +265,8 @@ stages:
 
   - job: ReviewApp
     dependsOn: 
-    - Deploy
     - DeployDBSchema
-    condition: |
-      and
-      (
-        succeeded('Deploy'),
-        in(dependencies.DeployDBSchema.result, 'Succeeded', 'Skipped')
-      )    
+    condition: succeeded('DeployDBSchema')
     pool: 
       vmImage: 'ubuntu-20.04'
     variables:
