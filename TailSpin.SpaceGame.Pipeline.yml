@@ -8,20 +8,19 @@ variables:
   dbName: 'tailspindatabase' # Name of database
   serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot' # web server dir
-  storageAccountName: 'spacegamedbstorage2134$(environmentNameLower)' # Name of storage account. Must be unique and lowercase.
+  storageAccountName: 'spacegamedbstorage2134$(System.StageName)' # Name of storage account. Must be unique and lowercase.
 
   # Other variables
   Major: '1'
   Minor: '1'
   Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
-  environmentNameLower: ${{ lower(variables['System.StageName'] ) }}
   buildConfiguration: 'Release'
   dotnetSdkVersion: '3.1.100'
-  resourceGroup: $(appName)-$(environmentNameLower)-rg
-  appServiceName: $(appName)-$(environmentNameLower)-$(appID)
-  appServicePlanName: $(appName)-$(environmentNameLower)-service-plan
-  sqlServerName: '$(appName)-$(environmentNameLower)-sql'
-  SITE_URL: 'https://$(appName)-$(environmentNameLower)-$(appID).azurewebsites.net'  
+  resourceGroup: $(appName)-$(System.StageName)-rg
+  appServiceName: $(appName)-$(System.StageName)-$(appID)
+  appServicePlanName: $(appName)-$(System.StageName)-service-plan
+  sqlServerName: '$(appName)-$(System.StageName)-sql'
+  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'  
  
 resources:
   repositories:
@@ -175,7 +174,7 @@ stages:
         artifactName: dropARM
       condition: succeededOrFailed()
 
-- stage: 'Dev'
+- stage: 'dev'
   displayName: 'Deploy to the dev environment'
   dependsOn:
   - Build 
@@ -280,10 +279,10 @@ stages:
         repositoryName: '$(Build.Repository.Name)'
         comment: 'The new app is ready for testing: $(SITE_URL)' 
 
-- stage: 'Test'
+- stage: 'test'
   displayName: 'Deploy to the test environment'
   dependsOn:
-  - Dev
+  - dev
   jobs:
   - deployment: Deploy
     pool:
@@ -388,8 +387,8 @@ stages:
     steps: 
     - template: load-tests.yml@templates
 
-- stage: 'Prod' 
-  displayName: 'Deploy to the Production environment'
+- stage: 'prod' 
+  displayName: 'Deploy to the production environment'
   dependsOn: Test
   condition: succeeded('Test')
   jobs:
@@ -480,7 +479,7 @@ stages:
 
 - stage: 'Cleanup'
   displayName: 'Cleanup dev environment'
-  condition: or(failed(), succeeded('Prod'))
+  condition: or(failed(), succeeded('prod'))
   jobs:
   - deployment: Deploy
     pool:
@@ -499,4 +498,4 @@ stages:
                 azureSubscription: $(serviceConnection)
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
-                inlineScript: 'az webapp delete --name $(appName)-Dev-$(appID) --yes'
+                inlineScript: 'az webapp delete --name $(appName)-dev-$(appID) --yes'
