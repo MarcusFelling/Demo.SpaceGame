@@ -311,8 +311,15 @@ stages:
         instructions: 'DBA approval required for schema change'
     
   - deployment: DeployDBSchema
-    dependsOn: DBSchemaApproval
-    condition: succeeded('DBSchemaApproval')
+    dependsOn: 
+    - Deploy
+    - DBSchemaApproval
+    condition: |
+      and
+      (
+        succeeded('Deploy'),
+        in(dependencies.DBSchemaApproval.result, 'Succeeded', 'Skipped')
+      )     
     pool:
       vmImage: 'windows-2019'
     environment: test
@@ -414,8 +421,15 @@ stages:
         instructions: 'DBA approval required for schema change'
     
   - deployment: DeployDBSchema
-    dependsOn: DBSchemaApproval
-    condition: succeeded('DBSchemaApproval')
+    dependsOn: 
+    - Deploy
+    - DBSchemaApproval
+    condition: |
+      and
+      (
+        succeeded('Deploy'),
+        in(dependencies.DBSchemaApproval.result, 'Succeeded', 'Skipped')
+      )     
     pool:
       vmImage: 'windows-2019'
     environment: prod
