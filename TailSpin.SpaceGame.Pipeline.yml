@@ -373,11 +373,9 @@ stages:
     dependsOn: Deploy
     displayName: 'Run UI tests'
     pool:
-      vmImage: 'vs2017-win2016'
+      vmImage: 'ubuntu-20.04'
     variables:    
     - group: SpaceGame
-    - name: SITE_URL
-      value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
     steps:
     - template: functional-tests.yml@templates
 
@@ -502,4 +500,4 @@ stages:
                 azureSubscription: $(serviceConnection)
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
-                inlineScript: 'az webapp delete --name $(appName)-dev-$(appID) --yes'
+                inlineScript: 'az webapp delete --name $(appName)-dev-$(appID)'
