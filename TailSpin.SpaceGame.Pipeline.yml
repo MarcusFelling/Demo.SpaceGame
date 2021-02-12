@@ -376,6 +376,8 @@ stages:
       vmImage: 'vs2017-win2016'
     variables:    
     - group: SpaceGame
+    - name: SITE_URL
+      value: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'
     steps:
     - template: functional-tests.yml@templates
 
