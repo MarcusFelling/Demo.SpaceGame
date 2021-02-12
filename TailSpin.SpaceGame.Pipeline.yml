@@ -266,7 +266,7 @@ stages:
         succeeded('Deploy'),
         in(dependencies.DeployDBSchema.result, 'Succeeded', 'Skipped')
       )    
-    pool: server
+    pool: ubuntu-latest
     variables:
     - group: SpaceGame     
     steps:
