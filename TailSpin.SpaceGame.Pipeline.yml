@@ -8,7 +8,7 @@ variables:
   dbName: 'tailspindatabase' # Name of database
   serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot' # web server dir
-  storageAccountName: 'spacegamedbstorage2134$(System.StageName)' # Name of storage account. Must be unique and lowercase.
+  storageAccountName: 'spacegamedbstorage$(System.StageName)' # Name of storage account. Must be unique and lowercase.
 
   # Other variables
   Major: '1'
