@@ -505,4 +505,4 @@ stages:
                 azureSubscription: $(serviceConnection)
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
-                inlineScript: 'az webapp delete --name $(appName)-dev-$(appID)'
+                inlineScript: 'az webapp delete --name $(appName)-dev-$(appID) --resource-group $(appName)-dev-rg'
