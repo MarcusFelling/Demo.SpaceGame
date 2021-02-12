@@ -275,8 +275,7 @@ stages:
       inputs:
         gitHubConnection: 'MarcusFelling'
         repositoryName: '$(Build.Repository.Name)'
-        comment: 'The new app is ready for testing: $(SITE_URL)'
-      condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'), eq(variables['System.StageName'], 'Dev'))  
+        comment: 'The new app is ready for testing: $(SITE_URL)' 
 
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
