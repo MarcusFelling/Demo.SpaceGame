@@ -6,9 +6,9 @@ variables:
   appName: 'tailspin-space-game' # Prefix for resource group, site URL, web app, and app service plan
   region: 'West US' # Region for all resources
   dbName: 'tailspindatabase' # Name of database
-  serviceConnection: SpaceGame-NonProd # Service connection uses service principal, prod requires approval                        
+  serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot' # web server dir
-  storageAccountName: '$(environmentNameLower)spacegamedbstorage2134' # Name of storage account. Must be unique and lowercase.
+  storageAccountName: 'spacegamedbstorage2134$(environmentNameLower)' # Name of storage account. Must be unique and lowercase.
 
   # Other variables
   Major: '1'
