@@ -371,6 +371,7 @@ stages:
 
   - job: RunUITests
     condition: succeeded('DeployDBSchema')
+    dependsOn: DeployDBSchema    
     displayName: 'Run UI tests'
     pool:
       vmImage: 'windows-2019'
@@ -381,6 +382,7 @@ stages:
 
   - job: RunLoadTests
     condition: succeeded('RunUITests') 
+    dependsOn: RunUITests 
     displayName: 'Run load tests'
     pool:
       vmImage: 'ubuntu-20.04'
