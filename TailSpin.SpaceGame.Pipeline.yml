@@ -279,7 +279,7 @@ stages:
       inputs:
         gitHubConnection: 'MarcusFelling'
         repositoryName: '$(Build.Repository.Name)'
-        comment: 'The new app is ready for testing: $(SITE_URL)' 
+        comment: 'Your changes are ready for testing: $(SITE_URL)' 
 
 - stage: 'test'
   displayName: 'Deploy to the test environment'
