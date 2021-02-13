@@ -109,3 +109,11 @@ resource connectionString 'Microsoft.Web/sites/config@2020-06-01' = {
     }
   }
 }
+
+resource appConfig 'Microsoft.Web/sites/config@2018-11-01' = {
+  name: '${appService.name}/web'
+  location: region
+  properties: {
+    netFrameworkVersion: 'v5.0'
+  }
+}
