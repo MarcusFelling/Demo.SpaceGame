@@ -374,7 +374,7 @@ stages:
     dependsOn: DeployDBSchema    
     displayName: 'Run UI tests'
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'windows-2019' 
     variables:    
     - group: SpaceGame
     steps:
