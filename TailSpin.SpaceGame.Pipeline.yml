@@ -370,8 +370,7 @@ stages:
                 Update-VSTeamVariableGroup @methodParameters
 
   - job: RunUITests
-    dependsOn: 
-    - DeployDBSchema
+    condition: succeeded('DeployDBSchema')
     displayName: 'Run UI tests'
     pool:
       vmImage: 'windows-2019'
@@ -381,8 +380,7 @@ stages:
     - template: functional-tests.yml@templates
 
   - job: RunLoadTests
-    dependsOn: 
-    - RunUITests    
+    condition: succeeded('RunUITests') 
     displayName: 'Run load tests'
     pool:
       vmImage: 'ubuntu-20.04'
