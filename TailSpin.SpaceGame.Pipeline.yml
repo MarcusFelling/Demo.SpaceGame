@@ -375,7 +375,7 @@ stages:
     displayName: 'Run UI tests'
     pool:
       vmImage: 'windows-2019' 
-    variables:      
+    variables:
     - group: SpaceGame
     - name: appID
       value: '26178'
