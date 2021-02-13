@@ -372,32 +372,13 @@ stages:
   - job: RunUITests
     condition: succeeded('DeployDBSchema')
     dependsOn: DeployDBSchema    
-    displayName: 'Run UI tests on Laptop'
-    pool: 'Laptop'
-    variables:    
-    - group: SpaceGame
-    steps:
-    - template: functional-tests.yml@templates
-  
-  - job: RunUITestsLinux
-    condition: succeeded('DeployDBSchema')
-    dependsOn: DeployDBSchema    
-    displayName: 'Run UI tests on Linux'
+    displayName: 'Run UI tests'
     pool:
-      vmImage: 'ubuntu-20.04' 
-    variables:    
+      vmImage: 'windows-2019' 
+    variables:      
     - group: SpaceGame
-    steps:
-    - template: functional-tests.yml@templates  
-
-  - job: RunUITestsWin2016
-    condition: succeeded('DeployDBSchema')
-    dependsOn: DeployDBSchema    
-    displayName: 'Run UI tests on vs2017-win2016'
-    pool:
-      vmImage: 'vs2017-win2016' 
-    variables:    
-    - group: SpaceGame
+    - name: appID
+      value: '26178'
     steps:
     - template: functional-tests.yml@templates
 
