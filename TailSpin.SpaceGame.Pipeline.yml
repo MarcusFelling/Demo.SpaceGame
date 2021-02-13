@@ -371,7 +371,6 @@ stages:
 
   - job: RunUITests
     dependsOn: 
-    - Deploy
     - DeployDBSchema
     displayName: 'Run UI tests'
     pool:
@@ -383,9 +382,7 @@ stages:
 
   - job: RunLoadTests
     dependsOn: 
-    - RunUITests
-    - Deploy
-    - DeployDBSchema
+    - RunUITests    
     displayName: 'Run load tests'
     pool:
       vmImage: 'ubuntu-20.04'
