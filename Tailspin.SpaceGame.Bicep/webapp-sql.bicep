@@ -18,10 +18,6 @@ resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
     administratorLoginPassword: dbPassword
     version: '12.0'
   }
-  identity:{
-    type:'UserAssigned'
-    
-  }
 }
 
 resource sqlServerADAdmin 'Microsoft.Sql/servers/administrators@2019-06-01-preview' = {
