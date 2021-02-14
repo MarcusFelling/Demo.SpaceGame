@@ -137,7 +137,7 @@ resource appConfig 'Microsoft.Web/sites/config@2018-11-01' = {
 
 // Managed Identity
 param managedIdentityName string
-param roleDefinitionId string = 'b24988ac-6180-42a0-ab88-20f7382dd24c' //Default as contributor role
+param roleDefinitionId string = '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'
 
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
   name: managedIdentityName
