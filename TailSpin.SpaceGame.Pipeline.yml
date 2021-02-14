@@ -19,6 +19,7 @@ variables:
   resourceGroup: $(appName)-$(System.StageName)-rg
   appServiceName: $(appName)-$(System.StageName)-$(appID)
   appServicePlanName: $(appName)-$(System.StageName)-service-plan
+  managedIdentityName: $(appName)-identity
   sqlServerName: '$(appName)-$(System.StageName)-sql'
   SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'  
  

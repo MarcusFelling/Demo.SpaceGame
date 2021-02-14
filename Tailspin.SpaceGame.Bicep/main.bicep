@@ -15,7 +15,8 @@ module spacegame './webapp-sql.bicep' = {
   params:{
     region: '__region__'
     servicePlanName: '__appServicePlanName__'
-    appServiceName: '__appServiceName__'  
+    appServiceName: '__appServiceName__'
+    managedIdentityName: '__managedIdentityName__'  
     dbUserName: '__adminLogin__'
     dbPassword: '__adminPassword__'    
     sqlServerName: '__sqlServerName__' 

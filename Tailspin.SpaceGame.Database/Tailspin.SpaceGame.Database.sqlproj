@@ -68,5 +68,6 @@
     <Build Include="dbo\Tables\Profile.sql" />
     <Build Include="dbo\Tables\Achievements.sql" />
     <Build Include="dbo\Tables\ProfileAchievements.sql" />
+    <Build Include="dbo\managedIdentity.sql" />
   </ItemGroup>
 </Project>
