@@ -1,399 +1,137 @@
-name: $(Major).$(Minor).$(Patch)
-trigger: none
-     
-variables:
-  # Required variables
-  appName: 'tailspin-space-game' # Prefix for resource group, site URL, web app, and app service plan
-  region: 'West US' # Region for all resources
-  dbName: 'tailspindatabase' # Name of database
-  serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
-  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot' # web server dir
-  storageAccountName: 'spacegamedbstorage$(System.StageName)' # Name of storage account. Must be unique and lowercase.
-  appServiceSku: 'B1' # Default SKU, prod and test set to S1
+steps:
+  # Download artifacts for web app, db, and Bicep/ARM
+  - download: current
+    displayName: App Download
+    artifact: dropApp
+  - download: current
+    displayName: ARM Template Download
+    artifact: dropARM
+  - download: current
+    displayName: Dacpac Download
+    artifact: dropDacpac
 
-  # Other variables
-  Major: '1'
-  Minor: '1'
-  Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
-  buildConfiguration: 'Release'
-  dotnetSdkVersion: '3.1.100'
-  resourceGroup: $(appName)-$(System.StageName)-rg
-  appServiceName: $(appName)-$(System.StageName)-$(appID)
-  appServicePlanName: $(appName)-$(System.StageName)-service-plan
-  sqlServerName: '$(appName)-$(System.StageName)-sql'
-  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'  
- 
-resources:
-  repositories:
-    - repository: templates 
-      type: github
-      name: MarcusFelling/Demo.Templates
-      endpoint: templates
+  - task: replacetokens@3
+    displayName: 'Replace Tokens with Variables'
+    inputs:
+      targetFiles: '$(Pipeline.Workspace)/dropARM/$(infrAsCodeFolder)/*.json'
+      encoding: 'auto'
+      writeBOM: true
+      escapeType: 'none'
+      actionOnMissing: 'fail'
+      keepToken: false
+      tokenPrefix: '__'
+      tokenSuffix: '__'
+      useLegacyPattern: false
+      enableTelemetry: true
 
-stages:
-- stage: 'Build'
-  jobs: 
-  - job: 'BuildApp'
-    pool:
-      vmImage: 'vs2017-win2016'
-      demands:
-        - npm
-        
-    steps:
-    - task: DotNetCoreInstaller@2
-      displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
-      inputs:
-        packageType: sdk
-        version: '$(dotnetSdkVersion)'
-        
-    - task: DotNetCoreCLI@2
-      displayName: 'Install ReportGenerator'
-      inputs:
-        command: custom
-        custom: tool
-        arguments: 'install --global dotnet-reportgenerator-globaltool'
-        
-    - task: Npm@1
-      displayName: 'Run npm install'
-      inputs:
-        verbose: false
-
-    - script: './node_modules/.bin/node-sass $(wwwrootDir) --output $(wwwrootDir)'
-      displayName: 'Compile Sass assets'
-
-    - task: gulp@1
-      displayName: 'Run gulp tasks'
-
-    - script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
-      displayName: 'Write build info'
-      workingDirectory: $(wwwrootDir)
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Restore project dependencies'
-      inputs:
-        command: 'restore'
-        projects: '**/*.csproj'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Build the project - $(buildConfiguration)'
-      inputs:
-        command: 'build'
-        arguments: '--no-restore --configuration $(buildConfiguration)'
-        projects: '**/*.csproj'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Run unit tests - $(buildConfiguration)'
-      inputs:
-        command: 'test'
-        arguments: '--no-build --configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
-        publishTestResults: true
-        projects: '**/*.Tests.csproj'
-        testRunTitle: 'Unit Tests'
-
-    - script: |
-        reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines
-      displayName: 'Create code coverage report'
-
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage report'
-      inputs:
-        codeCoverageTool: 'cobertura'
-        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish the project - $(buildConfiguration)'
-      inputs:
-        command: 'publish'
-        projects: '**/Tailspin.SpaceGame.Web.csproj'
-        publishWebProjects: false
-        arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
-        zipAfterPublish: true
-
-    - publish: '$(Build.ArtifactStagingDirectory)'
-      artifact: dropApp
-
-  - job: BuildDacpac
-    pool:
-      vmImage: 'windows-2019'
-    steps:
-    - task: DotNetCoreCLI@2
-      displayName: 'Restore project dependencies'
-      inputs:
-        command: 'restore'
-        projects: '**/*.csproj'
-
-    - task: VSBuild@1
-      displayName: 'Build the database project'
-      inputs:
-        project: '**/*.sqlproj'
-
-    - task: CopyFiles@2
-      displayName: 'Copy dacpac file to staging directory'
-      inputs:
-        contents: |
-          Tailspin.SpaceGame.Database/bin/**/*.dacpac
-        targetFolder: '$(Build.StagingDirectory)'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact'
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: dropDacpac
-      condition: succeededOrFailed()
-
-  - job: BuildBicep
-    pool:
-      vmImage: 'ubuntu-20.04'
-    steps:
-    - script: |
-        # Fetch the latest Bicep CLI binary
-        curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
-        # Mark it as executable
-        chmod +x ./bicep
-        # Add bicep to your PATH (requires admin)
-        sudo mv ./bicep /usr/local/bin/bicep
-        # Verify you can now access the 'bicep' command
-        bicep --help
-        # Done!
-      displayName: 'Install Bicep'
-      
-    - script: |
-        bicep build Tailspin.SpaceGame.Bicep/main.bicep
-      displayName: 'Run Bicep Build'      
-
-    - task: CopyFiles@2
-      displayName: 'Copy ARM Template (.json) files to staging directory'
-      inputs:
-        contents: |
-          Tailspin.SpaceGame.Bicep/**/*.json
-        targetFolder: '$(Build.StagingDirectory)'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact' 
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: dropARM
-      condition: succeededOrFailed()
-
-- stage: 'dev'
-  displayName: 'Deploy to the dev environment'
-  dependsOn:
-  - Build 
-  condition: succeeded('Build')
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'windows-2019'
-    environment: dev
-    variables:
-    - group: SpaceGame
-    - name: appID
-      value: $(Build.BuildId)    
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: spacegame-bicep-deploy.yml@templates
-
-  - job: DBSchemaApproval
-    dependsOn: ReviewApp
-    condition: eq(variables['schemaChanged'], True)
-    pool: server
-    variables:
-    - group: SpaceGame     
-    steps:
-    - task: ManualValidation@0
-      inputs:
-        notifyUsers: 'mafellin@microsoft.com'
-        instructions: 'DBA approval required for schema change'
+  - task: AzureCLI@2
+    # Only run in Dev. What-if is not production ready because of issues like https://github.com/Azure/arm-template-whatif/issues/73
+    displayName: 'Preview ARM template changes'
+    condition: eq(variables['System.StageName'], 'dev')
+    inputs:
+      azureSubscription: $(serviceConnection)
+      scriptType: 'ps'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az deployment sub what-if --location WestUS --template-file $(Pipeline.Workspace)/dropARM/$(infrAsCodeFolder)/main.json
     
-  - deployment: PostDBSchemaApproval
-    dependsOn: 
-    - DBSchemaApproval
-    pool:
-      vmImage: 'windows-2019'
-    environment: dev
-    variables:
-    - group: SpaceGame
-    strategy:
-      runOnce:
-        deploy:
-          steps:    
-          - task: PowerShell@2
-            displayName: 'Remove "schemaChanged" pipeline variable'
-            inputs:
-              targetType: 'inline'
-              script: | 
-                Install-Module VSTeam -Scope CurrentUser -Force
-                Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
-                $methodParameters = @{
-                  ProjectName = "$(System.TeamProject)"
-                  Name = "SpaceGame"}
-                $vg = Get-VSTeamVariableGroup  @methodParameters 
-                $vars = @{}
-                $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
-                $vars.Remove("schemaChanged")
-                $methodParameters = @{
-                  id = $vg.id
-                  ProjectName = "$(System.TeamProject)"
-                  Name = "SpaceGame"
-                  Description = ""
-                  Type = "Vsts"
-                  Variables = $vars}
-                Update-VSTeamVariableGroup @methodParameters
+  - task: AzureCLI@2
+    displayName: 'Deploy ARM Template'
+    inputs:
+      azureSubscription: $(serviceConnection)
+      scriptType: 'ps'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az deployment sub create --location WestUS --template-file $(Pipeline.Workspace)/dropARM/$(infrAsCodeFolder)/main.json
+    condition: succeeded() 
 
-  - job: ReviewApp
-    dependsOn: 
-    - Deploy
-    condition: succeeded('Deploy')
-    pool: 
-      vmImage: 'ubuntu-20.04'
-    variables:
-    - group: SpaceGame  
-    - name: appID
-      value: $(Build.BuildId)
-    steps:
-    - task: GitHubComment@0
-      displayName: 'Add PR comment with site url'  
-      inputs:
-        gitHubConnection: 'MarcusFelling'
-        repositoryName: '$(Build.Repository.Name)'
-        comment: 'Your changes are ready for testing: $(SITE_URL)' 
+  - task: SqlAzureDacpacDeployment@1
+    displayName: Generate DB schema change script
+    inputs:
+      azureSubscription: '$(serviceConnection)'
+      authenticationType: 'server'
+      serverName: '$(sqlServerName).database.windows.net'
+      databaseName: '$(dbname)'
+      sqlUsername: '$(adminlogin)'
+      sqlPassword: '$(adminPassword)'
+      deployType: 'DacpacTask'
+      deploymentAction: 'Script'
+      dacpacFile: '$(Pipeline.Workspace)/dropDacpac/$(dbSchemaFolder)/bin/Debug/$(dbSchemaFolder).dacpac'
+      ipDetectionMethod: 'AutoDetect'
 
-- stage: 'test'
-  displayName: 'Deploy to the test environment'
-  dependsOn:
-  - dev
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'windows-2019'
-    environment: test
-    variables:      
-    - group: SpaceGame
-    - name: appID
-      value: '26178'  
-    - name: appServiceSku
-      value: 'S1'      
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: spacegame-bicep-deploy.yml@templates
+  - task: PowerShell@2
+    displayName: Show DB change script and check for schema changes
+    inputs:
+      targetType: 'inline'
+      script: | 
+        # Print the schema change script
+        Write-Host "Auto Generated SQL Update Script:"
+        Get-Content $(Build.SourcesDirectory)\GeneratedOutputFiles\$(dbname)_Script.sql | foreach {Write-Output $_}
 
-  - job: RunUITests
-    condition: succeeded('Deploy')
-    dependsOn: Deploy    
-    displayName: 'Run UI tests'
-    pool:
-      vmImage: 'windows-2019' 
-    variables:
-    - group: SpaceGame
-    - name: appID
-      value: '26178'
-    steps:
-    - template: functional-tests.yml@templates
+        # Check for schema changes
+        $file = Get-Content "$(Build.SourcesDirectory)\GeneratedOutputFiles\$(dbname)_Script.sql"
+        $containsWord = $file | %{$_ -match "CREATE" -or $_ -match "ALTER" -or $_ -match "DROP"}
+        if ($containsWord -contains $true) {
+          Install-Module VSTeam -Scope CurrentUser -Force
+          Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
+          $methodParameters = @{
+            ProjectName = "$(System.TeamProject)"
+            Name = "SpaceGame"}
+          $vg = Get-VSTeamVariableGroup @methodParameters
+          $vars = @{}
+          $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
+          $varName = "schemaChanged"
+          $vars.$varName= @{}
+          $vars.$varName.value = "True"
+          $vars.$varName.isSecret = $false
+          $methodParameters = @{
+            id = $vg.id
+            ProjectName = "$(System.TeamProject)"
+            Name = "SpaceGame"
+            Description = ""
+            Type = "Vsts"
+            Variables = $vars}
+          Update-VSTeamVariableGroup @methodParameters}
 
-  - job: RunLoadTests
-    condition: succeeded('RunUITests') 
-    dependsOn: RunUITests 
-    displayName: 'Run load tests'
-    pool:
-      vmImage: 'ubuntu-20.04'
-    variables:
-      jmeterVersion: '5.2'
-    steps: 
-    - template: load-tests.yml@templates
+  - task: SqlAzureDacpacDeployment@1
+    displayName: 'Deploy DB'
+    inputs:
+      azureSubscription: '$(serviceConnection)'
+      authenticationType: 'server'
+      serverName: '$(sqlServerName).database.windows.net'
+      databaseName: '$(dbName)'
+      sqlUsername: '$(adminlogin)'
+      sqlPassword: '$(adminPassword)'
+      deployType: 'DacpacTask'
+      deploymentAction: 'Publish'
+      dacpacFile: '$(Pipeline.Workspace)/dropDacpac/$(dbSchemaFolder)/bin/Debug/$(dbSchemaFolder).dacpac'
+      ipDetectionMethod: 'AutoDetect'
 
-  - job: DBSchemaApproval
-    dependsOn: RunLoadTests
-    condition: eq(variables['schemaChanged'], True)
-    pool: server
-    variables:
-    - group: SpaceGame     
-    steps:
-    - task: ManualValidation@0
-      inputs:
-        notifyUsers: 'mafellin@microsoft.com'
-        instructions: 'DBA approval required for schema change'
-    
-  - deployment: PostDBSchemaApproval
-    dependsOn: 
-    - DBSchemaApproval
-    pool:
-      vmImage: 'windows-2019'
-    environment: dev
-    variables:
-    - group: SpaceGame
-    strategy:
-      runOnce:
-        deploy:
-          steps:    
-          - task: PowerShell@2
-            displayName: 'Remove "schemaChanged" pipeline variable'
-            inputs:
-              targetType: 'inline'
-              script: | 
-                Install-Module VSTeam -Scope CurrentUser -Force
-                Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
-                $methodParameters = @{
-                  ProjectName = "$(System.TeamProject)"
-                  Name = "SpaceGame"}
-                $vg = Get-VSTeamVariableGroup  @methodParameters 
-                $vars = @{}
-                $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
-                $vars.Remove("schemaChanged")
-                $methodParameters = @{
-                  id = $vg.id
-                  ProjectName = "$(System.TeamProject)"
-                  Name = "SpaceGame"
-                  Description = ""
-                  Type = "Vsts"
-                  Variables = $vars}
-                Update-VSTeamVariableGroup @methodParameters
+  - task: AzureWebApp@1
+    displayName: 'Deploy app (no slot)'
+    condition: eq(variables['System.StageName'], 'dev')
+    inputs:
+      azureSubscription: '$(serviceConnection)'
+      appName: '$(appservicename)'
+      package: '$(Pipeline.Workspace)/dropApp/$(buildConfiguration)/*.zip'
 
-- stage: 'prod' 
-  displayName: 'Deploy to the production environment'
-  dependsOn: Test
-  condition: succeeded('Test')
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'windows-2019'
-    environment: prod
-    variables:
-    - group: SpaceGame
-    - name:  serviceConnection
-      value: SpaceGame-Prod
-    - name: appServiceSku
-      value: 'S1'
-    - name: appID
-      value: '26178' 
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: spacegame-bicep-deploy.yml@templates
+  - task: AzureWebApp@1
+    displayName: 'Deploy app to deploy slot'
+    condition: ne(variables['System.StageName'], 'dev')
+    inputs:
+      azureSubscription: '$(serviceConnection)'
+      deployToSlotOrASE: 'true'
+      slotName: 'swap'
+      appName: '$(appservicename)'
+      package: '$(Pipeline.Workspace)/dropApp/$(buildConfiguration)/*.zip' 
 
-- stage: 'Cleanup'
-  displayName: 'Cleanup dev environment'
-  condition: or(failed(), succeeded('prod'))
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'windows-2019'
-    environment: dev 
-    variables:
-    - group: SpaceGame
-    - name: appID
-      value: $(Build.BuildId)    
-    strategy:
-      runOnce: 
-        deploy:
-          steps:
-          - task: AzureCLI@2
-            inputs:
-                azureSubscription: $(serviceConnection)
-                scriptType: 'pscore'
-                scriptLocation: 'inlineScript'
-                inlineScript: 'az webapp delete --name $(appName)-dev-$(appID) --resource-group $(appName)-dev-rg'
+  - task: AzureAppServiceManage@0
+    displayName: 'Swap deployment slots'
+    condition: ne(variables['System.StageName'], 'dev')    
+    inputs:
+      azureSubscription: '$(serviceConnection)'
+      resourceGroupName: '$(resourceGroup)'
+      webAppName: '$(appservicename)'
+      sourceSlot: 'swap'
+      targetSlot: 'production'
+      action: 'Swap Slots'
