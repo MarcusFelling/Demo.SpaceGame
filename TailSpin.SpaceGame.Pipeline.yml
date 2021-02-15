@@ -29,7 +29,7 @@ steps:
     displayName: 'Preview ARM template changes'
     condition: eq(variables['System.StageName'], 'dev')
     inputs:
-      azureSubscription: $(serviceConnection)
+      azureSubscription: '$(serviceConnection)'
       scriptType: 'ps'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -38,7 +38,7 @@ steps:
   - task: AzureCLI@2
     displayName: 'Deploy ARM Template'
     inputs:
-      azureSubscription: $(serviceConnection)
+      azureSubscription: '$(serviceConnection)'
       scriptType: 'ps'
       scriptLocation: 'inlineScript'
       inlineScript: |
