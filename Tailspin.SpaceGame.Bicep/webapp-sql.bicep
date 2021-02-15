@@ -118,3 +118,15 @@ resource appConfig 'Microsoft.Web/sites/config@2018-11-01' = {
     netFrameworkVersion: 'v5.0'
   }
 }
+
+/* Add after conditions are implemented
+resource deploySlot 'Microsoft.Web/sites/slots@2018-11-01' = {
+  name: '${appService.name}/swap'
+  location: region
+  kind: 'app'
+  properties: {
+    enabled: true
+    serverFarmId: '${servicePlan.id}'
+  }
+}
+*/
