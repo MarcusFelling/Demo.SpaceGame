@@ -1,10 +1,8 @@
-name: "Terraform"
-on:
-  deployment
-
+name: "InfrastructureChanges"
+on: [workflow_dispatch]
 jobs:
   terraform:
-    name: "Terraform"
+    name: "Run Terraform Plan"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,7 +52,3 @@ jobs:
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve
