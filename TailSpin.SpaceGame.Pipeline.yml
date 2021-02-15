@@ -9,6 +9,7 @@ variables:
   serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot' # web server dir
   storageAccountName: 'spacegamedbstorage$(System.StageName)' # Name of storage account. Must be unique and lowercase.
+  appServiceSku: 'B1' # Default SKU, prod and test set to B3
 
   # Other variables
   Major: '1'
@@ -196,7 +197,7 @@ stages:
           - template: spacegame-bicep-deploy.yml@templates
 
   - job: DBSchemaApproval
-    dependsOn: Deploy
+    dependsOn: ReviewApp
     condition: eq(variables['schemaChanged'], True)
     pool: server
     variables:
@@ -273,80 +274,13 @@ stages:
     - group: SpaceGame
     - name: appID
       value: '26178'  
+    - name: appServiceSku
+      value: 'B3'      
     strategy:
       runOnce:
         deploy:
           steps:
           - template: spacegame-bicep-deploy.yml@templates
-
-  - job: DBSchemaApproval
-    dependsOn: Deploy
-    condition: eq(variables['schemaChanged'], True)
-    pool: server
-    variables:
-    - group: SpaceGame     
-    steps:
-    - task: ManualValidation@0
-      inputs:
-        notifyUsers: 'mafellin@microsoft.com'
-        instructions: 'DBA approval required for schema change'
-    
-  - deployment: DeployDBSchema
-    dependsOn: 
-    - Deploy
-    - DBSchemaApproval
-    condition: |
-      and
-      (
-        succeeded('Deploy'),
-        in(dependencies.DBSchemaApproval.result, 'Succeeded', 'Skipped')
-      )     
-    pool:
-      vmImage: 'windows-2019'
-    environment: test
-    variables:
-    - group: SpaceGame
-    strategy:
-      runOnce:
-        deploy:
-          steps:    
-          - download: current
-            artifact: dropDacpac            
-          - task: SqlAzureDacpacDeployment@1
-            displayName: 'Deploy SQL schema'
-            inputs:
-              azureSubscription: '$(serviceConnection)'
-              authenticationType: 'server'
-              serverName: '$(sqlServerName).database.windows.net'
-              databaseName: '$(dbName)'
-              sqlUsername: '$(adminlogin)'
-              sqlPassword: '$(adminPassword)'
-              deployType: 'DacpacTask'
-              deploymentAction: 'Publish'
-              dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
-              ipDetectionMethod: 'AutoDetect'
-          - task: PowerShell@2
-            displayName: 'Remove "schemaChanged" pipeline variable'
-            inputs:
-              targetType: 'inline'
-              script: | 
-                Install-Module VSTeam -Scope CurrentUser -Force
-                Set-VSTeamAccount –Account $(System.CollectionUri) -PersonalAccessToken $(PAT)
-                $methodParameters = @{
-                  ProjectName = "$(System.TeamProject)"
-                  Name = "SpaceGame"}
-                $vg = Get-VSTeamVariableGroup  @methodParameters 
-                $vars = @{}
-                $vg.variables | Get-Member -MemberType *Property | %{$vars.($_.Name) = $vg.variables.($_.Name)}
-                $vars.Remove("schemaChanged")
-                $methodParameters = @{
-                  id = $vg.id
-                  ProjectName = "$(System.TeamProject)"
-                  Name = "SpaceGame"
-                  Description = ""
-                  Type = "Vsts"
-                  Variables = $vars}
-                Update-VSTeamVariableGroup @methodParameters
 
   - job: RunUITests
     condition: succeeded('DeployDBSchema')
@@ -372,29 +306,8 @@ stages:
     steps: 
     - template: load-tests.yml@templates
 
-- stage: 'prod' 
-  displayName: 'Deploy to the production environment'
-  dependsOn: Test
-  condition: succeeded('Test')
-  jobs:
-  - deployment: Deploy
-    pool:
-      vmImage: 'windows-2019'
-    environment: prod
-    variables:
-    - group: SpaceGame
-    - name:  serviceConnection
-      value: SpaceGame-Prod
-    - name: appID
-      value: '26178' 
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - template: spacegame-bicep-deploy.yml@templates
-
   - job: DBSchemaApproval
-    dependsOn: Deploy
+    dependsOn: RunLoadTests
     condition: eq(variables['schemaChanged'], True)
     pool: server
     variables:
@@ -405,40 +318,18 @@ stages:
         notifyUsers: 'mafellin@microsoft.com'
         instructions: 'DBA approval required for schema change'
     
-  - deployment: DeployDBSchema
+  - deployment: PostDBSchemaApproval
     dependsOn: 
-    - Deploy
     - DBSchemaApproval
-    condition: |
-      and
-      (
-        succeeded('Deploy'),
-        in(dependencies.DBSchemaApproval.result, 'Succeeded', 'Skipped')
-      )     
     pool:
       vmImage: 'windows-2019'
-    environment: prod
+    environment: dev
     variables:
     - group: SpaceGame
     strategy:
       runOnce:
         deploy:
           steps:    
-          - download: current
-            artifact: dropDacpac            
-          - task: SqlAzureDacpacDeployment@1
-            displayName: 'Deploy SQL schema'
-            inputs:
-              azureSubscription: '$(serviceConnection)'
-              authenticationType: 'server'
-              serverName: '$(sqlServerName).database.windows.net'
-              databaseName: '$(dbName)'
-              sqlUsername: '$(adminlogin)'
-              sqlPassword: '$(adminPassword)'
-              deployType: 'DacpacTask'
-              deploymentAction: 'Publish'
-              dacpacFile: '$(Pipeline.Workspace)/dropDacpac/Tailspin.SpaceGame.Database/bin/Debug/Tailspin.SpaceGame.Database.dacpac'
-              ipDetectionMethod: 'AutoDetect'
           - task: PowerShell@2
             displayName: 'Remove "schemaChanged" pipeline variable'
             inputs:
@@ -461,6 +352,29 @@ stages:
                   Type = "Vsts"
                   Variables = $vars}
                 Update-VSTeamVariableGroup @methodParameters
+
+- stage: 'prod' 
+  displayName: 'Deploy to the production environment'
+  dependsOn: Test
+  condition: succeeded('Test')
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'windows-2019'
+    environment: prod
+    variables:
+    - group: SpaceGame
+    - name:  serviceConnection
+      value: SpaceGame-Prod
+    - name: appServiceSku
+      value: 'B3'
+    - name: appID
+      value: '26178' 
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: spacegame-bicep-deploy.yml@templates
 
 - stage: 'Cleanup'
   displayName: 'Cleanup dev environment'

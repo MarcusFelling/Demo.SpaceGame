@@ -81,13 +81,14 @@ resource firewallAllowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@20
 
 // Web App
 param servicePlanName string
-param appServiceName string 
+param appServiceName string
+param appServiceSku string
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName
   location: region
   sku:{
-    name: 'B1'
+    name: appServiceSku
     capacity: 1
   }
 }
