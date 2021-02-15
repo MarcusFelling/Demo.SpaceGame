@@ -244,7 +244,7 @@ stages:
   - job: ReviewApp
     dependsOn: 
     - Deploy
-    condition: succeeded('DeployDBSchema')
+    condition: succeeded('Deploy')
     pool: 
       vmImage: 'ubuntu-20.04'
     variables:
