@@ -99,6 +99,7 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
   properties: {
     serverFarmId: '${servicePlan.id}'
   }
+  
 }
 
 resource connectionString 'Microsoft.Web/sites/config@2020-06-01' = {
