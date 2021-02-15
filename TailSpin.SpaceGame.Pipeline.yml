@@ -194,6 +194,18 @@ stages:
           steps:
           - template: spacegame-bicep-deploy.yml@templates
 
+  - job: InfraApproval
+    dependsOn: Deploy
+    condition: eq(variables['infraDeleted'], True)
+    pool: server
+    variables:
+    - group: SpaceGame     
+    steps:
+    - task: ManualValidation@0
+      inputs:
+        notifyUsers: 'mafellin@microsoft.com'
+        instructions: 'Approval required for infrastructure change'
+
   - job: DBSchemaApproval
     dependsOn: Deploy
     condition: eq(variables['schemaChanged'], True)
