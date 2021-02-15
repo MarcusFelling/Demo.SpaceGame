@@ -4,12 +4,13 @@ trigger: none
 variables:
   # Required variables
   appName: 'tailspin-space-game' # Prefix for resource group, site URL, web app, and app service plan
+  projectName: 'Tailspin.SpaceGame' # Project and folder name prefix
   region: 'West US' # Region for all resources
   dbName: 'tailspindatabase' # Name of database
   serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
-  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot' # web server dir
   storageAccountName: 'spacegamedbstorage$(System.StageName)' # Name of storage account. Must be unique and lowercase.
   appServiceSku: 'B1' # Default SKU, prod and test set to S1
+  adminEmails: 'mafellin@microsoft.com' # Users required for approvals
 
   # Other variables
   Major: '1'
@@ -21,7 +22,11 @@ variables:
   appServiceName: $(appName)-$(System.StageName)-$(appID)
   appServicePlanName: $(appName)-$(System.StageName)-service-plan
   sqlServerName: '$(appName)-$(System.StageName)-sql'
-  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net'  
+  SITE_URL: 'https://$(appName)-$(System.StageName)-$(appID).azurewebsites.net' 
+  wwwrootDir: '$(webFolder)/wwwroot' # web server dir
+  webFolder: '$(projectName).Web'
+  dbSchemaFolder: '$(projectName).Database'
+  infraAsCodeFolder: '$(projectName).Bicep'
  
 resources:
   repositories:
@@ -105,7 +110,7 @@ stages:
       displayName: 'Publish the project - $(buildConfiguration)'
       inputs:
         command: 'publish'
-        projects: '**/Tailspin.SpaceGame.Web.csproj'
+        projects: '**/$(webFolder).csproj'
         publishWebProjects: false
         arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
         zipAfterPublish: true
@@ -132,7 +137,7 @@ stages:
       displayName: 'Copy dacpac file to staging directory'
       inputs:
         contents: |
-          Tailspin.SpaceGame.Database/bin/**/*.dacpac
+          $(dbSchemaFolder)/bin/**/*.dacpac
         targetFolder: '$(Build.StagingDirectory)'
 
     - task: PublishBuildArtifacts@1
@@ -159,14 +164,14 @@ stages:
       displayName: 'Install Bicep'
       
     - script: |
-        bicep build Tailspin.SpaceGame.Bicep/main.bicep
+        bicep build $(infraAsCodeFolder)/main.bicep
       displayName: 'Run Bicep Build'      
 
     - task: CopyFiles@2
       displayName: 'Copy ARM Template (.json) files to staging directory'
       inputs:
         contents: |
-          Tailspin.SpaceGame.Bicep/**/*.json
+          $(infraAsCodeFolder)/**/*.json
         targetFolder: '$(Build.StagingDirectory)'
 
     - task: PublishBuildArtifacts@1
@@ -205,7 +210,7 @@ stages:
     steps:
     - task: ManualValidation@0
       inputs:
-        notifyUsers: 'mafellin@microsoft.com'
+        notifyUsers: '$(adminEmails)'
         instructions: 'DBA approval required for schema change'
     
   - deployment: PostDBSchemaApproval
@@ -315,7 +320,7 @@ stages:
     steps:
     - task: ManualValidation@0
       inputs:
-        notifyUsers: 'mafellin@microsoft.com'
+        notifyUsers: $(adminEmails)
         instructions: 'DBA approval required for schema change'
     
   - deployment: PostDBSchemaApproval
