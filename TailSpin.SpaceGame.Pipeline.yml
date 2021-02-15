@@ -290,7 +290,7 @@ stages:
 
   - job: ReviewApp
     dependsOn: 
-    - DeployDBSchema
+    - dev
     condition: succeeded('DeployDBSchema')
     pool: 
       vmImage: 'ubuntu-20.04'
