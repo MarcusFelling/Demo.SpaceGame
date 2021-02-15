@@ -9,6 +9,7 @@ variables:
   serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
   wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot' # web server dir
   storageAccountName: 'spacegamedbstorage$(System.StageName)' # Name of storage account. Must be unique and lowercase.
+  appServiceSku: 'B1' # Default SKU, prod and test set to B3
 
   # Other variables
   Major: '1'
@@ -272,6 +273,8 @@ stages:
     - group: SpaceGame
     - name: appID
       value: '26178'  
+    - name: appServiceSku
+      value: 'B3'      
     strategy:
       runOnce:
         deploy:
@@ -384,6 +387,8 @@ stages:
     - group: SpaceGame
     - name:  serviceConnection
       value: SpaceGame-Prod
+    - name: appServiceSku
+      value: 'B3'
     - name: appID
       value: '26178' 
     strategy:
