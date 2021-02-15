@@ -99,7 +99,6 @@ resource appService 'Microsoft.Web/sites@2020-06-01' = {
   properties: {
     serverFarmId: '${servicePlan.id}'
   }
-  
 }
 
 resource connectionString 'Microsoft.Web/sites/config@2020-06-01' = {
@@ -111,3 +110,15 @@ resource connectionString 'Microsoft.Web/sites/config@2020-06-01' = {
     }
   }
 }
+
+/* Add after conditions are implemented
+resource deploySlot 'Microsoft.Web/sites/slots@2018-11-01' = {
+  name: '${appService.name}/swap'
+  location: region
+  kind: 'app'
+  properties: {
+    enabled: true
+    serverFarmId: '${servicePlan.id}'
+  }
+}
+*/

@@ -282,8 +282,8 @@ stages:
           - template: spacegame-bicep-deploy.yml@templates
 
   - job: RunUITests
-    condition: succeeded('DeployDBSchema')
-    dependsOn: DeployDBSchema    
+    condition: succeeded('Deploy')
+    dependsOn: Deploy    
     displayName: 'Run UI tests'
     pool:
       vmImage: 'windows-2019' 
