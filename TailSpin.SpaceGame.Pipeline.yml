@@ -26,7 +26,8 @@ variables:
   webFolder: '$(projectName).Web'
   dbSchemaFolder: '$(projectName).Database'
   infraAsCodeFolder: '$(projectName).Bicep'
- 
+
+# Repo where templates live
 resources:
   repositories:
     - repository: templates 
@@ -261,7 +262,7 @@ stages:
     - task: GitHubComment@0
       displayName: 'Add PR comment with site url'  
       inputs:
-        gitHubConnection: 'MarcusFelling'
+        gitHubConnection: 'GitHubSpaceGame'
         repositoryName: '$(Build.Repository.Name)'
         comment: 'Your changes are ready for testing: $(SITE_URL)' 
 
