@@ -10,7 +10,6 @@ variables:
   serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
   storageAccountName: 'spacegamedbstorage$(System.StageName)' # Name of storage account. Must be unique and lowercase.
   appServiceSku: 'B1' # Default SKU, prod and test set to S1
-  adminEmails: 'mafellin@microsoft.com' # Users required for approvals
 
   # Other variables
   Major: '1'
