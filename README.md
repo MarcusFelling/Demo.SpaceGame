@@ -6,9 +6,9 @@ The Space Game website is a .NET Core app written in C# that's deployed to Azure
 
 # CI/CD
 
-[![Build Status](https://dev.azure.com/MSFT-MarcusFelling/Demo/_apis/build/status/TailSpin.SpaceGame.Pipeline?repoName=MarcusFelling%2FDemo.SpaceGame&branchName=master)](https://dev.azure.com/MSFT-MarcusFelling/Demo/_build/latest?definitionId=77&repoName=MarcusFelling%2FDemo.SpaceGame&branchName=master)
+[![Build Status](https://dev.azure.com/MSFT-MarcusFelling/Demo/_apis/build/status/TailSpin.SpaceGame.Pipeline?repoName=MarcusFelling%2FDemo.SpaceGame&branchName=main)](https://dev.azure.com/MSFT-MarcusFelling/Demo/_build/latest?definitionId=77&repoName=MarcusFelling%2FDemo.SpaceGame&branchName=master)
 
-1. The main branch is set up with a [branch protection rule](https://docs.github.com/en/github/administering-a-repository/managing-a-branch-protection-rule#:~:text=You%20can%20create%20a%20branch,merged%20into%20the%20protected%20branch.) that requires [TailSpin.SpaceGame.Pipeline](https://github.com/MarcusFelling/Demo.SpaceGame/blob/master/TailSpin.SpaceGame.Pipeline.yml). This means the topic branch that is targeting main, will need to successfully make it through the entirety of the pipeline before the PR can be completed and merged into main.
+1. The main branch is set up with a [branch protection rule](https://docs.github.com/en/github/administering-a-repository/managing-a-branch-protection-rule#:~:text=You%20can%20create%20a%20branch,merged%20into%20the%20protected%20branch.) that requires [TailSpin.SpaceGame.Pipeline](https://github.com/MarcusFelling/Demo.SpaceGame/blob/main/TailSpin.SpaceGame.Pipeline.yml). This means the topic branch that is targeting main, will need to successfully make it through the entirety of the pipeline before the PR can be completed and merged into main.
 2. The build stage of the pipeline ensures all projects successfully compile and unit tests pass. 
 3. The pipeline will then add a comment to your PR with the URL to a new Azure Web App containing your changes, that can be used for exploratory testing or remote debugging.
 3. Meanwhile, the pipeline will execute UI and load tests in a testing environment. 
