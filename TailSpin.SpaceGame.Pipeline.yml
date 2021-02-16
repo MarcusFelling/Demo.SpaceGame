@@ -17,7 +17,7 @@ variables:
   Minor: '1'
   Patch: $[counter(format('{0}.{1}', variables['Major'], variables['Minor']), 0)]
   buildConfiguration: 'Release'
-  dotnetSdkVersion: '3.1.100'
+  dotnetSdkVersion: '5.0.103' 
   resourceGroup: $(appName)-$(System.StageName)-rg
   appServiceName: $(appName)-$(System.StageName)-$(appID)
   appServicePlanName: $(appName)-$(System.StageName)-service-plan
@@ -45,12 +45,13 @@ stages:
         - npm
         
     steps:
-    - task: DotNetCoreInstaller@2
-      displayName: 'Use .NET Core SDK $(dotnetSdkVersion)'
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
       inputs:
         packageType: sdk
-        version: '$(dotnetSdkVersion)'
-        
+        version: $(dotnetSdkVersion)
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
     - task: DotNetCoreCLI@2
       displayName: 'Install ReportGenerator'
       inputs:
