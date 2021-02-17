@@ -307,7 +307,7 @@ stages:
     pool:
       vmImage: 'ubuntu-20.04'
     variables:
-      jmeterVersion: '5.2'
+      jmeterVersion: '5.4'
     steps: 
     - template: load-tests.yml@templates
 
