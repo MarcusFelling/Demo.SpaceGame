@@ -194,7 +194,9 @@ stages:
     variables:
     - group: SpaceGame
     - name: appID
-      value: $(Build.BuildId)    
+      value: $(Build.BuildId)
+    - name: devEnv
+      value: true 
     strategy:
       runOnce:
         deploy:
@@ -280,7 +282,9 @@ stages:
     - name: appID
       value: '26178'  
     - name: appServiceSku
-      value: 'S1'      
+      value: 'S1'  
+    - name: devEnv
+      value: false          
     strategy:
       runOnce:
         deploy:
@@ -375,6 +379,8 @@ stages:
       value: 'S1'
     - name: appID
       value: '26178' 
+    - name: devEnv
+      value: true      
     strategy:
       runOnce:
         deploy:

@@ -1,6 +1,3 @@
-// All resources
-param region string
-
 // SQL
 param sqlServerName string
 param storageAccountName string
@@ -12,7 +9,7 @@ param dbPassword string {
 
 resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   name: sqlServerName
-  location: region
+  location: resourceGroup().location
   properties: {
     administratorLogin: dbUserName
     administratorLoginPassword: dbPassword
@@ -22,7 +19,7 @@ resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
   name: storageAccountName
-  location: region
+  location: resourceGroup().location
   sku: {
     name: 'Standard_RAGRS'
     tier: 'Standard'
@@ -53,7 +50,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' =
 
 resource database 'Microsoft.Sql/servers/databases@2020-08-01-preview' = {
   name: '${sqlServer.name}/${dbName}'
-  location: region
+  location: resourceGroup().location
   sku: {
     name: 'GP_S_Gen5'
     tier: 'GeneralPurpose'
@@ -79,54 +76,5 @@ resource firewallAllowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@20
   }
 }
 
-// Web App
-param servicePlanName string
-param appServiceName string
-param appServiceSku string
-
-resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
-  name: servicePlanName
-  location: region
-  sku:{
-    name: appServiceSku
-    capacity: 1
-  }
-}
-
-resource appService 'Microsoft.Web/sites@2020-06-01' = {
-  name: appServiceName
-  location: region
-  properties: {
-    serverFarmId: '${servicePlan.id}'
-  }
-}
-
-resource connectionString 'Microsoft.Web/sites/config@2020-06-01' = {
-  name: '${appService.name}/connectionstrings'
-  properties: {
-    DefaultConnection: {
-      value: 'Data Source=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${dbName};User Id=${dbUserName}@${sqlServer.properties.fullyQualifiedDomainName};Password=${dbPassword};'
-      type: 'SQLAzure'
-    }
-  }
-}
-
-resource appConfig 'Microsoft.Web/sites/config@2018-11-01' = {
-  name: '${appService.name}/web'
-  location: region
-  properties: {
-    netFrameworkVersion: 'v5.0'
-  }
-}
-
-/* Add after conditions are implemented
-resource deploySlot 'Microsoft.Web/sites/slots@2018-11-01' = {
-  name: '${appService.name}/swap'
-  location: region
-  kind: 'app'
-  properties: {
-    enabled: true
-    serverFarmId: '${servicePlan.id}'
-  }
-}
-*/
+// Use output for connection string in web app module
+output sqlServerFQDN string = sqlServer.properties.fullyQualifiedDomainName
