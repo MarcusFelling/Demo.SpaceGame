@@ -380,7 +380,7 @@ stages:
     - name: appID
       value: '26178' 
     - name: devEnv
-      value: true      
+      value: false      
     strategy:
       runOnce:
         deploy:

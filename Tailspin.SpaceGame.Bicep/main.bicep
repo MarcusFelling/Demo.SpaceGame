@@ -11,7 +11,7 @@ resource spacegameRg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
 // Create sql
 module sql './sql.bicep' = {
   name: 'sql'
-  scope: spacegameRg
+  scope: resourceGroup(spacegameRg.id)
   params:{
     sqlServerName: '__sqlServerName__'
     storageAccountName: '__storageAccountName__'
@@ -24,7 +24,7 @@ module sql './sql.bicep' = {
 // Create web app 
 module webapp './webapp.bicep' = {
   name: 'webapp'
-  scope: spacegameRg
+  scope: resourceGroup(spacegameRg.id)
   params:{
     servicePlanName: '__appServicePlanName__'
     appServiceName: '__appServiceName__'
