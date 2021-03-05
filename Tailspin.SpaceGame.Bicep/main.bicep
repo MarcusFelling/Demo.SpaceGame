@@ -4,6 +4,7 @@
 // Create sql
 module sql './sql.bicep' = {
   name: 'sql'
+  scope: resourceGroup('__resourceGroup__')
   params:{
     sqlServerName: '__sqlServerName__'
     storageAccountName: '__storageAccountName__'
@@ -16,6 +17,7 @@ module sql './sql.bicep' = {
 // Create web app 
 module webapp './webapp.bicep' = {
   name: 'webapp'
+  scope: resourceGroup('__resourceGroup__')
   params:{
     servicePlanName: '__appServicePlanName__'
     appServiceName: '__appServiceName__'
