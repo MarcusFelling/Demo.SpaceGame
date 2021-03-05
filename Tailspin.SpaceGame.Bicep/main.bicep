@@ -1,17 +1,9 @@
 // Creates all infrastructure for Space Game
 // All params are set by pipeline variables through token replacement
-targetScope = 'subscription' // subscription scope required to create resource group
-
-// Create resource group
-resource spacegameRg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
-  name: '__resourceGroup__'
-  location: '__region__'
-}
 
 // Create sql
 module sql './sql.bicep' = {
   name: 'sql'
-  scope: resourceGroup(spacegameRg.id)
   params:{
     sqlServerName: '__sqlServerName__'
     storageAccountName: '__storageAccountName__'
@@ -24,7 +16,6 @@ module sql './sql.bicep' = {
 // Create web app 
 module webapp './webapp.bicep' = {
   name: 'webapp'
-  scope: resourceGroup(spacegameRg.id)
   params:{
     servicePlanName: '__appServicePlanName__'
     appServiceName: '__appServiceName__'
