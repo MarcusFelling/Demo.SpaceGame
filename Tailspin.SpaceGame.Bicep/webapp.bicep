@@ -8,7 +8,7 @@ param dbUserName string
 param dbPassword string {
   secure: true
 }
-param devEnv bool = true // Used in condition for deployment slots
+param devEnv string // Used in condition for deployment slots
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName
@@ -46,7 +46,7 @@ resource appConfig 'Microsoft.Web/sites/config@2018-11-01' = {
 }
 
 // Deploy deployment slot if it's not a dev environment
-resource deploySlot 'Microsoft.Web/sites/slots@2018-11-01' = if(devEnv == false) {
+resource deploySlot 'Microsoft.Web/sites/slots@2018-11-01' = if(devEnv == 'false') {
   name: '${appService.name}/swap'
   location: resourceGroup().location
   kind: 'app'

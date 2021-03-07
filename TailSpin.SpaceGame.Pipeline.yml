@@ -5,7 +5,7 @@ variables:
   # Required variables
   appName: 'tailspin-space-game' # Prefix for resource group, site URL, web app, and app service plan
   projectName: 'Tailspin.SpaceGame' # Project and folder name prefix
-  region: 'West US' # Region for all resources
+  region: 'WestUS' # Region for all resources
   dbName: 'tailspindatabase' # Name of database
   serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
   storageAccountName: 'spacegamedbstorage$(System.StageName)' # Name of storage account. Must be unique and lowercase.
@@ -196,7 +196,7 @@ stages:
     - name: appID
       value: $(Build.BuildId)
     - name: devEnv
-      value: true 
+      value: 'true' 
     strategy:
       runOnce:
         deploy:
@@ -205,7 +205,7 @@ stages:
 
   - job: DBSchemaApproval
     dependsOn: ReviewApp
-    condition: eq(variables['schemaChanged'], True)
+    condition: and(succeeded(), eq(variables['schemaChanged'], True))
     pool: server
     variables:
     - group: SpaceGame     
@@ -284,7 +284,7 @@ stages:
     - name: appServiceSku
       value: 'S1'  
     - name: devEnv
-      value: false          
+      value: 'false'        
     strategy:
       runOnce:
         deploy:
@@ -317,7 +317,7 @@ stages:
 
   - job: DBSchemaApproval
     dependsOn: RunLoadTests
-    condition: eq(variables['schemaChanged'], True)
+    condition: and(succeeded(), eq(variables['schemaChanged'], True))
     pool: server
     variables:
     - group: SpaceGame     
@@ -380,7 +380,7 @@ stages:
     - name: appID
       value: '26178' 
     - name: devEnv
-      value: false      
+      value: 'false'   
     strategy:
       runOnce:
         deploy:
