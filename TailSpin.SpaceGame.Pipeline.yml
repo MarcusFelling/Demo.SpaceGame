@@ -205,7 +205,7 @@ stages:
 
   - job: DBSchemaApproval
     dependsOn: ReviewApp
-    condition: eq(variables['schemaChanged'], True)
+    condition: and(succeeded(), eq(variables['schemaChanged'], True))
     pool: server
     variables:
     - group: SpaceGame     
@@ -317,7 +317,7 @@ stages:
 
   - job: DBSchemaApproval
     dependsOn: RunLoadTests
-    condition: eq(variables['schemaChanged'], True)
+    condition: and(succeeded(), eq(variables['schemaChanged'], True))
     pool: server
     variables:
     - group: SpaceGame     
