@@ -33,6 +33,6 @@ module webapp './webapp.bicep' = {
     dbName: '__dbName__' // Used for connection string
     dbUserName: '__adminLogin__' // Used for connection string
     dbPassword: '__adminPassword__' // Used for connection string
-    devEnv: true // Used for deployment slots, set in pipeline
+    devEnv: '__devEnv__' // Used for deployment slots, set in pipeline
     }
 }      

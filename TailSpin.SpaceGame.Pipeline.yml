@@ -196,7 +196,7 @@ stages:
     - name: appID
       value: $(Build.BuildId)
     - name: devEnv
-      value: true 
+      value: 'true' 
     strategy:
       runOnce:
         deploy:
@@ -284,7 +284,7 @@ stages:
     - name: appServiceSku
       value: 'S1'  
     - name: devEnv
-      value: false          
+      value: 'false'        
     strategy:
       runOnce:
         deploy:
@@ -380,7 +380,7 @@ stages:
     - name: appID
       value: '26178' 
     - name: devEnv
-      value: false      
+      value: 'false'   
     strategy:
       runOnce:
         deploy:
