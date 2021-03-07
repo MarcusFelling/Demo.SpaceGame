@@ -5,7 +5,7 @@ variables:
   # Required variables
   appName: 'tailspin-space-game' # Prefix for resource group, site URL, web app, and app service plan
   projectName: 'Tailspin.SpaceGame' # Project and folder name prefix
-  region: 'West US' # Region for all resources
+  region: 'WestUS' # Region for all resources
   dbName: 'tailspindatabase' # Name of database
   serviceConnection: SpaceGame-NonProd # Default service principal, prod set in prod stage and requires approval                        
   storageAccountName: 'spacegamedbstorage$(System.StageName)' # Name of storage account. Must be unique and lowercase.
