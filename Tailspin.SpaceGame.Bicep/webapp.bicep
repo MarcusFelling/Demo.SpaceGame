@@ -5,14 +5,14 @@ param appServiceSku string
 param sqlServer string
 param dbName string
 param dbUserName string
-param dbPassword string {
-  secure: true
-}
+@secure()
+param dbPassword string
 param devEnv string // Used in condition for deployment slots
+param location string = resourceGroup().location
 
 resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
   name: servicePlanName
-  location: resourceGroup().location
+  location: location
   sku:{
     name: appServiceSku
     capacity: 1
@@ -21,13 +21,13 @@ resource servicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
 
 resource appService 'Microsoft.Web/sites@2020-06-01' = {
   name: appServiceName
-  location: resourceGroup().location
+  location: location
   properties: {
     serverFarmId: '${servicePlan.id}'
   }
 }
 
-resource connectionString 'Microsoft.Web/sites/config@2020-06-01' = {
+resource connectionString 'Microsoft.Web/sites/config@2021-01-01' = {
   name: '${appService.name}/connectionstrings'
   properties: {
     DefaultConnection: {
@@ -39,7 +39,6 @@ resource connectionString 'Microsoft.Web/sites/config@2020-06-01' = {
 
 resource appConfig 'Microsoft.Web/sites/config@2018-11-01' = {
   name: '${appService.name}/web'
-  location: resourceGroup().location
   properties: {
     netFrameworkVersion: 'v5.0'
   }
@@ -48,7 +47,7 @@ resource appConfig 'Microsoft.Web/sites/config@2018-11-01' = {
 // Deploy deployment slot if it's not a dev environment
 resource deploySlot 'Microsoft.Web/sites/slots@2018-11-01' = if(devEnv == 'false') {
   name: '${appService.name}/swap'
-  location: resourceGroup().location
+  location: location
   kind: 'app'
   properties: {
     enabled: true

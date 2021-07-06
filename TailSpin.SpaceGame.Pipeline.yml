@@ -165,21 +165,7 @@ stages:
       
     - script: |
         bicep build $(infraAsCodeFolder)/main.bicep
-      displayName: 'Run Bicep Build'      
-
-    - task: CopyFiles@2
-      displayName: 'Copy ARM Template (.json) files to staging directory'
-      inputs:
-        contents: |
-          $(infraAsCodeFolder)/**/*.json
-        targetFolder: '$(Build.StagingDirectory)'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact' 
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: dropARM
-      condition: succeededOrFailed()
+      displayName: 'Run Bicep Build'
 
 - stage: 'dev'
   displayName: 'Deploy to the dev environment'

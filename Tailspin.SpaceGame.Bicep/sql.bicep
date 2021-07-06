@@ -3,13 +3,13 @@ param sqlServerName string
 param storageAccountName string
 param dbName string
 param dbUserName string
-param dbPassword string {
-  secure: true
-}
+@secure()
+param dbPassword string
+param location string = resourceGroup().location
 
 resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
   name: sqlServerName
-  location: resourceGroup().location
+  location: location
   properties: {
     administratorLogin: dbUserName
     administratorLoginPassword: dbPassword
@@ -19,7 +19,7 @@ resource sqlServer 'Microsoft.Sql/servers@2019-06-01-preview' = {
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' = {
   name: storageAccountName
-  location: resourceGroup().location
+  location: location
   sku: {
     name: 'Standard_RAGRS'
     tier: 'Standard'
@@ -50,7 +50,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2020-08-01-preview' =
 
 resource database 'Microsoft.Sql/servers/databases@2020-08-01-preview' = {
   name: '${sqlServer.name}/${dbName}'
-  location: resourceGroup().location
+  location: location
   sku: {
     name: 'GP_S_Gen5'
     tier: 'GeneralPurpose'
