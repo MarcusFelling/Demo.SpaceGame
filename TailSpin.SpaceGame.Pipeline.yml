@@ -157,6 +157,7 @@ stages:
       inputs:
         azureSubscription: $(serviceConnection)
         scriptLocation: 'inlineScript'
+        scriptType: 'shell'
         inlineScript: | 
           az bicep build $(infraAsCodeFolder)/main.bicep
 
