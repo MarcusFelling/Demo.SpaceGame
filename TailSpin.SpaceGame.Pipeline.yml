@@ -159,6 +159,20 @@ stages:
         scriptType: 'pscore'
         scriptLocation: 'inlineScript'
         inlineScript: 'az bicep build --file $(infraAsCodeFolder)/main.bicep'
+      
+    - task: CopyFiles@2
+      displayName: 'Copy Bicep templates to staging directory'
+      inputs:
+        contents: |
+          $(infraAsCodeFolder)/**/*.bicep
+        targetFolder: '$(Build.StagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact' 
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: dropIaC
+      condition: succeededOrFailed()
 
 - stage: 'dev'
   displayName: 'Deploy to the dev environment'
