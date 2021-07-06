@@ -332,6 +332,3 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-
-# Ignore generated ARM templates, treat same as binaries
-Tailspin.SpaceGame.Bicep/*.json
