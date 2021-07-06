@@ -155,11 +155,10 @@ stages:
       displayName: 'Run Bicep Build' 
       condition: succeeded()
       inputs:
-        azureSubscription: $(serviceConnection)
+        azureSubscription: '$(serviceConnection)'
+        scriptType: 'pscore'
         scriptLocation: 'inlineScript'
-        scriptType: 'batch'
-        inlineScript: | 
-          az bicep build $(infraAsCodeFolder)/main.bicep
+        inlineScript: 'az bicep build $(infraAsCodeFolder)/main.bicep'
 
 - stage: 'dev'
   displayName: 'Deploy to the dev environment'
