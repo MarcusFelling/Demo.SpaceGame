@@ -158,7 +158,7 @@ stages:
         azureSubscription: '$(serviceConnection)'
         scriptType: 'pscore'
         scriptLocation: 'inlineScript'
-        inlineScript: 'az bicep build $(infraAsCodeFolder)/main.bicep'
+        inlineScript: 'az bicep build --file $(infraAsCodeFolder)/main.bicep'
 
 - stage: 'dev'
   displayName: 'Deploy to the dev environment'
