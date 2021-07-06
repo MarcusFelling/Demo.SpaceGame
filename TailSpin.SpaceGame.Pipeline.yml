@@ -151,21 +151,14 @@ stages:
     pool:
       vmImage: 'ubuntu-20.04'
     steps:
-    - script: |
-        # Fetch the latest Bicep CLI binary
-        curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
-        # Mark it as executable
-        chmod +x ./bicep
-        # Add bicep to your PATH (requires admin)
-        sudo mv ./bicep /usr/local/bin/bicep
-        # Verify you can now access the 'bicep' command
-        bicep --help
-        # Done!
-      displayName: 'Install Bicep'
-      
-    - script: |
-        bicep build $(infraAsCodeFolder)/main.bicep
-      displayName: 'Run Bicep Build'
+    - task: AzureCLI@2
+      displayName: 'Run Bicep Build' 
+      condition: succeeded()
+      inputs:
+        azureSubscription: $(serviceConnection)
+        scriptLocation: 'inlineScript'
+        inlineScript: | 
+          az bicep build $(infraAsCodeFolder)/main.bicep
 
 - stage: 'dev'
   displayName: 'Deploy to the dev environment'
